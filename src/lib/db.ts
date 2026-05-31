@@ -1,5 +1,4 @@
 import Database from "better-sqlite3";
-import fs from "node:fs";
 import path from "node:path";
 
 const globalForDb = globalThis as typeof globalThis & {
@@ -7,7 +6,12 @@ const globalForDb = globalThis as typeof globalThis & {
 };
 
 function databasePath() {
+  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+    return ":memory:";
+  }
+
   const configuredPath = process.env.SQLITE_PATH ?? "data/vitapower.db";
+
   return path.isAbsolute(configuredPath)
     ? configuredPath
     : path.join(process.cwd(), configuredPath);
@@ -15,11 +19,10 @@ function databasePath() {
 
 function createDatabase() {
   const filename = databasePath();
-  fs.mkdirSync(path.dirname(filename), { recursive: true });
 
   const database = new Database(filename);
-  database.pragma("journal_mode = WAL");
   database.pragma("foreign_keys = ON");
+
   migrate(database);
 
   return database;
@@ -27,9 +30,7 @@ function createDatabase() {
 
 export const db = globalForDb.vitaPowerDb ?? createDatabase();
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.vitaPowerDb = db;
-}
+globalForDb.vitaPowerDb = db;
 
 export function migrate(database: Database.Database = db) {
   database.exec(`
