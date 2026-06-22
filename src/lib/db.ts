@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import path from "node:path";
+import { seedDemoData } from "@/lib/demo-data";
 
 const globalForDb = globalThis as typeof globalThis & {
   vitaPowerDb?: Database.Database;
@@ -24,6 +25,10 @@ function createDatabase() {
   database.pragma("foreign_keys = ON");
 
   migrate(database);
+
+  if (filename === ":memory:") {
+    seedDemoData(database);
+  }
 
   return database;
 }
