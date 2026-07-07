@@ -86,5 +86,134 @@ export function migrate(database: Database.Database = db) {
     CREATE INDEX IF NOT EXISTS idx_lots_code ON lots(code);
     CREATE INDEX IF NOT EXISTS idx_lots_status ON lots(status);
     CREATE INDEX IF NOT EXISTS idx_lots_expiration_date ON lots(expiration_date);
+
+    CREATE TABLE IF NOT EXISTS client_contacts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      role TEXT,
+      email TEXT,
+      phone TEXT,
+      is_primary INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS projects (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_id INTEGER NOT NULL,
+      code TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      project_type TEXT NOT NULL DEFAULT 'private_label',
+      status TEXT NOT NULL DEFAULT 'briefing',
+      priority TEXT NOT NULL DEFAULT 'normal',
+      expected_delivery_date TEXT,
+      estimated_revenue_cents INTEGER NOT NULL DEFAULT 0,
+      notes TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE RESTRICT
+    );
+
+    CREATE TABLE IF NOT EXISTS suppliers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      tax_id TEXT,
+      contact_name TEXT,
+      email TEXT,
+      phone TEXT,
+      supplier_type TEXT NOT NULL DEFAULT 'general',
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS raw_materials (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      internal_code TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      category TEXT,
+      unit TEXT NOT NULL DEFAULT 'kg',
+      supplier_id INTEGER,
+      last_cost_cents INTEGER NOT NULL DEFAULT 0,
+      allergen_notes TEXT,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS packaging_materials (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      internal_code TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      packaging_type TEXT,
+      unit TEXT NOT NULL DEFAULT 'un',
+      supplier_id INTEGER,
+      last_cost_cents INTEGER NOT NULL DEFAULT 0,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS formulas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      product_id INTEGER,
+      project_id INTEGER,
+      code TEXT NOT NULL,
+      version TEXT NOT NULL,
+      name TEXT NOT NULL,
+      batch_yield_quantity REAL NOT NULL DEFAULT 0,
+      batch_yield_unit TEXT NOT NULL DEFAULT 'un',
+      status TEXT NOT NULL DEFAULT 'draft',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
+      UNIQUE (code, version)
+    );
+
+    CREATE TABLE IF NOT EXISTS formula_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      formula_id INTEGER NOT NULL,
+      raw_material_id INTEGER NOT NULL,
+      quantity REAL NOT NULL,
+      unit TEXT NOT NULL DEFAULT 'g',
+      loss_percentage REAL NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE,
+      FOREIGN KEY (raw_material_id) REFERENCES raw_materials(id) ON DELETE RESTRICT
+    );
+
+    CREATE TABLE IF NOT EXISTS pricing_models (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      product_id INTEGER,
+      project_id INTEGER,
+      formula_id INTEGER,
+      name TEXT NOT NULL,
+      raw_material_cost_cents INTEGER NOT NULL DEFAULT 0,
+      packaging_cost_cents INTEGER NOT NULL DEFAULT 0,
+      labor_cost_cents INTEGER NOT NULL DEFAULT 0,
+      tax_cents INTEGER NOT NULL DEFAULT 0,
+      card_fee_cents INTEGER NOT NULL DEFAULT 0,
+      representative_commission_cents INTEGER NOT NULL DEFAULT 0,
+      freight_cents INTEGER NOT NULL DEFAULT 0,
+      loss_margin_percentage REAL NOT NULL DEFAULT 0,
+      contribution_margin_percentage REAL NOT NULL DEFAULT 0,
+      final_price_cents INTEGER NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'draft',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
+      FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE SET NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_client_contacts_client_id ON client_contacts(client_id);
+    CREATE INDEX IF NOT EXISTS idx_projects_client_id ON projects(client_id);
+    CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
+    CREATE INDEX IF NOT EXISTS idx_raw_materials_supplier_id ON raw_materials(supplier_id);
+    CREATE INDEX IF NOT EXISTS idx_packaging_materials_supplier_id ON packaging_materials(supplier_id);
+    CREATE INDEX IF NOT EXISTS idx_formulas_product_id ON formulas(product_id);
+    CREATE INDEX IF NOT EXISTS idx_formulas_project_id ON formulas(project_id);
+    CREATE INDEX IF NOT EXISTS idx_formula_items_formula_id ON formula_items(formula_id);
+    CREATE INDEX IF NOT EXISTS idx_pricing_models_product_id ON pricing_models(product_id);
+    CREATE INDEX IF NOT EXISTS idx_pricing_models_project_id ON pricing_models(project_id);
   `);
 }
