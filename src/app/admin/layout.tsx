@@ -6,16 +6,17 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen bg-[#f6f8f2]">
-      <div className="mx-auto grid min-h-screen max-w-[1480px] grid-cols-1 lg:grid-cols-[280px_1fr]">
-        <aside className="border-b border-line bg-white px-5 py-5 lg:border-b-0 lg:border-r">
-          <div className="mb-8 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-moss text-sm font-black text-white">
+    <div className="min-h-screen bg-[#f4f5f7] text-ink">
+      <div className="mx-auto grid min-h-screen max-w-[1540px] grid-cols-1 lg:grid-cols-[296px_1fr]">
+        <aside className="sticky top-0 z-20 border-b border-line bg-white/95 px-5 py-5 backdrop-blur lg:h-screen lg:border-b-0 lg:border-r">
+          <div className="mb-7 flex items-center gap-3 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-950 to-red-950 p-4 text-white shadow-soft">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-700 text-sm font-black tracking-tight">
               VP
             </div>
             <div>
-              <p className="text-sm font-black text-ink">Vita Power</p>
-              <p className="text-xs font-semibold text-slate-500">Rastreabilidade</p>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-red-100">Vita Power</p>
+              <p className="text-base font-black">Workspace</p>
+              <p className="text-xs font-semibold text-slate-300">ERP industrial</p>
             </div>
           </div>
           <AdminNav />
