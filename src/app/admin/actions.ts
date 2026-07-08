@@ -1,7 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient, createLot, createProduct } from "@/lib/repository";
+import {
+  createClient,
+  createEngineeringMaterialFromForm,
+  createEngineeringPackagingFromForm,
+  createLot,
+  createProduct,
+  duplicateEngineeringMaterial,
+  duplicateEngineeringPackaging
+} from "@/lib/repository";
 import type { LotStatus } from "@/lib/types";
 
 function text(formData: FormData, key: string) {
@@ -63,4 +71,27 @@ export async function createLotAction(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/lotes");
+}
+
+
+export async function createEngineeringMaterialAction(formData: FormData) {
+  createEngineeringMaterialFromForm(formData);
+  revalidatePath("/admin");
+  revalidatePath("/admin/engenharia");
+}
+
+export async function createEngineeringPackagingAction(formData: FormData) {
+  createEngineeringPackagingFromForm(formData);
+  revalidatePath("/admin");
+  revalidatePath("/admin/engenharia");
+}
+
+export async function duplicateEngineeringMaterialAction(formData: FormData) {
+  duplicateEngineeringMaterial(numberValue(formData, "id"));
+  revalidatePath("/admin/engenharia");
+}
+
+export async function duplicateEngineeringPackagingAction(formData: FormData) {
+  duplicateEngineeringPackaging(numberValue(formData, "id"));
+  revalidatePath("/admin/engenharia");
 }
