@@ -1,0 +1,2 @@
+import { NextRequest, NextResponse } from "next/server";import { blingGet } from "@/lib/bling";
+export async function GET(req: NextRequest){try{return NextResponse.json(await blingGet("/ordens-producao",{pagina:req.nextUrl.searchParams.get("pagina")??1,limite:req.nextUrl.searchParams.get("limite")??20,situacao:req.nextUrl.searchParams.get("situacao")??undefined}))}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Erro ao consultar ordens de produção."},{status:500})}}

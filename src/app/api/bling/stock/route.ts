@@ -1,0 +1,2 @@
+import { NextRequest, NextResponse } from "next/server";import { blingGet } from "@/lib/bling";
+export async function GET(req: NextRequest){try{const id=req.nextUrl.searchParams.get("produtoId");return NextResponse.json(await blingGet(id?`/estoques/saldos/${id}`:"/estoques/saldos",{pagina:req.nextUrl.searchParams.get("pagina")??1,limite:req.nextUrl.searchParams.get("limite")??20}))}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Erro ao consultar estoque."},{status:500})}}

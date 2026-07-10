@@ -58,11 +58,6 @@ export type DashboardStats = {
   releasedLots: number;
   quarantineLots: number;
   expiringLots: number;
-  activeProjects: number;
-  rawMaterials: number;
-  packagingMaterials: number;
-  formulas: number;
-  pricingModels: number;
 };
 
 export type CreateClientInput = {
