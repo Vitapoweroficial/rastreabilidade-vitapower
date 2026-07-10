@@ -278,4 +278,3 @@ export function migrate(database: Database.Database = db) {
   ensureColumn(database, 'packaging_materials', 'material', 'TEXT');
   ensureColumn(database, 'packaging_materials', 'notes', 'TEXT');
 }
-
