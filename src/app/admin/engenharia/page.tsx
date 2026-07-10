@@ -1,14 +1,18 @@
 import { Beaker, Boxes, CheckCircle2, Copy, Factory, Package, Plus, Scale, Truck } from "lucide-react";
 import {
   addFormulaItemAction,
+  addFormulaPackagingItemAction,
   approveEngineeringFormulaAction,
   createEngineeringFormulaAction,
+  createEngineeringProjectAction,
+  createProposalFromPricingAction,
   createEngineeringSupplierAction,
   createPackagingMaterialAction,
   createRawMaterialAction,
-  duplicateEngineeringFormulaAction
+  duplicateEngineeringFormulaAction,
+  sendFormulaToPricingAction
 } from "@/app/admin/actions";
-import { listActiveClients, listActiveProducts, getEngineeringDashboard, listEngineeringFormulas, listEngineeringSuppliers, listFormulaItems, listPackagingMaterials, listRawMaterials } from "@/lib/repository";
+import { listActiveClients, listActiveProducts, getEngineeringDashboard, listCommercialProposals, listEngineeringFormulas, listEngineeringProjects, listEngineeringSuppliers, listFormulaItems, listFormulaPackagingItems, listPackagingMaterials, listPricingRequests, listRawMaterials } from "@/lib/repository";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +41,10 @@ export default function EngineeringPage() {
   const products = listActiveProducts();
   const selectedFormula = formulas[0];
   const selectedItems = selectedFormula ? listFormulaItems(selectedFormula.id) : [];
+  const selectedPackaging = selectedFormula ? listFormulaPackagingItems(selectedFormula.id) : [];
+  const projects = listEngineeringProjects();
+  const pricingRequests = listPricingRequests();
+  const proposals = listCommercialProposals();
 
   return <div className="space-y-8">
     <section className="panel overflow-hidden bg-gradient-to-br from-ink to-moss p-6 text-white">
@@ -46,6 +54,27 @@ export default function EngineeringPage() {
       <div className="mt-5 flex flex-wrap gap-2 text-xs font-black uppercase text-white/80">
         {['Matérias-primas', 'Embalagens', 'Fornecedores', 'Fórmulas', 'Versões'].map((item) => <span key={item} className="rounded-full border border-white/15 px-3 py-1">{item}</span>)}
       </div>
+    </section>
+
+
+
+    <section className="panel p-5">
+      <h2 className="text-xl font-black text-ink">Fluxo industrial integrado</h2>
+      <div className="mt-4 grid gap-2 md:grid-cols-5">
+        {['Cliente', 'Novo Projeto', 'Nova Fórmula', 'MP → % → g → kg', 'Embalagem → Custo → Precificação → Proposta'].map((step) => <div key={step} className="rounded-xl border border-line bg-white p-3 text-sm font-black text-slate-700">{step}</div>)}
+      </div>
+    </section>
+
+    <section className="panel p-5">
+      <h2 className="text-xl font-black text-ink">Novo Projeto</h2>
+      <form action={createEngineeringProjectAction} className="mt-4 grid gap-3 md:grid-cols-4">
+        <Field label="Cliente"><select className="select" name="clientId" required>{clients.map((client) => <option key={client.id} value={client.id}>{client.brandName}</option>)}</select></Field>
+        <Field label="Produto"><select className="select" name="productId"><option value="0">Novo produto</option>{products.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}</select></Field>
+        <Field label="Nome do projeto"><input className="field" name="name" required placeholder="Creatina 300g private label" /></Field>
+        <label className="space-y-1"><span className="label">Briefing</span><textarea className="textarea" name="briefing" /></label>
+        <button className="btn-primary md:col-span-4"><Plus size={16} />Criar projeto de desenvolvimento</button>
+      </form>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">{projects.map((project) => <div key={project.id} className="rounded-xl border border-line bg-white p-3"><p className="font-black text-ink">{project.name}</p><p className="text-sm text-slate-600">{project.client_brand_name} · {project.status}</p></div>)}</div>
     </section>
 
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -134,10 +163,16 @@ export default function EngineeringPage() {
 
       <div className="panel p-5 xl:col-span-2">
         <h2 className="text-xl font-black text-ink">Ingredientes da versão ativa</h2>
-        {selectedFormula ? <><p className="mt-1 text-sm text-slate-600">{selectedFormula.name} · {selectedFormula.code} · {selectedFormula.version}</p><form action={addFormulaItemAction} className="mt-4 grid gap-3 md:grid-cols-3"><input type="hidden" name="formulaId" value={selectedFormula.id} /><Field label="Matéria-prima"><select className="select" name="rawMaterialId">{materials.map((material) => <option key={material.id} value={material.id}>{material.internal_code} · {material.name}</option>)}</select></Field><Field label="%"><input className="field" name="percentage" type="number" step="0.0001" /></Field><Field label="g por dose"><input className="field" name="gramsPerServing" type="number" step="0.0001" /></Field><Field label="g por pote"><input className="field" name="gramsPerContainer" type="number" step="0.0001" /></Field><Field label="kg por lote"><input className="field" name="kgPerBatch" type="number" step="0.0001" /></Field><Field label="Observações"><input className="field" name="notes" /></Field><button className="btn-primary md:col-span-3"><Plus size={16} />Adicionar ingrediente</button></form><div className="mt-5 overflow-x-auto"><table className="w-full min-w-[780px] text-left text-sm"><thead><tr className="table-head"><th className="px-4 py-3">MP</th><th className="px-4 py-3">%</th><th className="px-4 py-3">g/dose</th><th className="px-4 py-3">g/pote</th><th className="px-4 py-3">kg/lote</th><th className="px-4 py-3">Custo</th></tr></thead><tbody>{selectedItems.map((item) => <tr key={item.id}><td className="table-cell font-black text-ink">{item.raw_material_code} · {item.raw_material_name}</td><td className="table-cell">{item.percentage}%</td><td className="table-cell">{item.grams_per_serving}</td><td className="table-cell">{item.grams_per_container}</td><td className="table-cell">{item.kg_per_batch}</td><td className="table-cell"><Money value={item.cost} /></td></tr>)}</tbody></table></div></> : <p className="text-sm text-slate-600">Crie uma fórmula para iniciar a engenharia de ingredientes.</p>}
+        {selectedFormula ? <><p className="mt-1 text-sm text-slate-600">{selectedFormula.name} · {selectedFormula.code} · {selectedFormula.version}</p><form action={addFormulaItemAction} className="mt-4 grid gap-3 md:grid-cols-3"><input type="hidden" name="formulaId" value={selectedFormula.id} /><Field label="Matéria-prima"><select className="select" name="rawMaterialId">{materials.map((material) => <option key={material.id} value={material.id}>{material.internal_code} · {material.name}</option>)}</select></Field><Field label="%"><input className="field" name="percentage" type="number" step="0.0001" /></Field><Field label="g por dose"><input className="field" name="gramsPerServing" type="number" step="0.0001" /></Field><Field label="g por pote"><input className="field" name="gramsPerContainer" type="number" step="0.0001" /></Field><Field label="kg por lote"><input className="field" name="kgPerBatch" type="number" step="0.0001" /></Field><Field label="Observações"><input className="field" name="notes" /></Field><button className="btn-primary md:col-span-3"><Plus size={16} />Adicionar ingrediente</button></form><div className="mt-5 overflow-x-auto"><table className="w-full min-w-[780px] text-left text-sm"><thead><tr className="table-head"><th className="px-4 py-3">MP</th><th className="px-4 py-3">%</th><th className="px-4 py-3">g/dose</th><th className="px-4 py-3">g/pote</th><th className="px-4 py-3">kg/lote</th><th className="px-4 py-3">Custo</th></tr></thead><tbody>{selectedItems.map((item) => <tr key={item.id}><td className="table-cell font-black text-ink">{item.raw_material_code} · {item.raw_material_name}</td><td className="table-cell">{item.percentage}%</td><td className="table-cell">{item.grams_per_serving}</td><td className="table-cell">{item.grams_per_container}</td><td className="table-cell">{item.kg_per_batch}</td><td className="table-cell"><Money value={item.cost} /></td></tr>)}</tbody></table></div><form action={addFormulaPackagingItemAction} className="mt-5 grid gap-3 md:grid-cols-3"><input type="hidden" name="formulaId" value={selectedFormula.id} /><Field label="Selecionar embalagem"><select className="select" name="packagingMaterialId">{packaging.map((item) => <option key={item.id} value={item.id}>{item.category} · {item.name}</option>)}</select></Field><Field label="Quantidade"><input className="field" name="quantity" type="number" step="0.0001" defaultValue="1" /></Field><button className="btn-secondary"><Package size={16} />Adicionar embalagem</button></form><div className="mt-3 grid gap-2 md:grid-cols-2">{selectedPackaging.map((item) => <div key={item.id} className="rounded-xl border border-line bg-white p-3 text-sm"><span className="font-black text-ink">{item.category} · {item.packaging_name}</span><span className="block text-slate-600">Qtd. {item.quantity} · Custo <Money value={item.cost} /></span></div>)}</div><form action={sendFormulaToPricingAction} className="mt-5"><input type="hidden" name="formulaId" value={selectedFormula.id} /><select className="select mb-3" name="projectId"><option value="0">Sem projeto vinculado</option>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select><button className="btn-primary"><Scale size={16} />Enviar para Precificação</button></form></> : <p className="text-sm text-slate-600">Crie uma fórmula para iniciar a engenharia de ingredientes.</p>}
       </div>
     </section>
 
-    <section className="panel overflow-hidden"><div className="border-b border-line px-5 py-4"><h2 className="text-lg font-black text-ink">Banco de versões, comparação e aprovação</h2><p className="text-sm text-slate-600">Duplique versões, compare totais e aprove fórmulas sem implementar propostas, precificação ou PDF nesta sprint.</p></div><div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead><tr className="table-head"><th className="px-4 py-3">Código</th><th className="px-4 py-3">Versão</th><th className="px-4 py-3">Nome</th><th className="px-4 py-3">Cliente</th><th className="px-4 py-3">Produto</th><th className="px-4 py-3">%</th><th className="px-4 py-3">Custo lote</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Ações</th></tr></thead><tbody>{formulas.map((formula) => <tr key={formula.id}><td className="table-cell font-black text-moss">{formula.code}</td><td className="table-cell">{formula.version}</td><td className="table-cell">{formula.name}</td><td className="table-cell">{formula.client_brand_name ?? '—'}</td><td className="table-cell">{formula.product_name ?? '—'}</td><td className="table-cell">{formula.total_percentage.toFixed(2)}%</td><td className="table-cell"><Money value={formula.total_cost} /></td><td className="table-cell">{formula.status}</td><td className="table-cell"><div className="flex gap-2"><form action={duplicateEngineeringFormulaAction}><input type="hidden" name="formulaId" value={formula.id} /><button className="btn-secondary"><Copy size={14} />Duplicar</button></form><form action={approveEngineeringFormulaAction}><input type="hidden" name="formulaId" value={formula.id} /><button className="btn-secondary"><CheckCircle2 size={14} />Aprovar</button></form></div></td></tr>)}</tbody></table></div></section>
+    <section className="panel overflow-hidden"><div className="border-b border-line px-5 py-4"><h2 className="text-lg font-black text-ink">Banco de versões, comparação e aprovação</h2><p className="text-sm text-slate-600">Duplique versões, compare totais e aprove fórmulas mantendo a trilha para precificação, proposta, modo cliente, PDF e envio.</p></div><div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead><tr className="table-head"><th className="px-4 py-3">Código</th><th className="px-4 py-3">Versão</th><th className="px-4 py-3">Nome</th><th className="px-4 py-3">Cliente</th><th className="px-4 py-3">Produto</th><th className="px-4 py-3">%</th><th className="px-4 py-3">Custo lote</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Ações</th></tr></thead><tbody>{formulas.map((formula) => <tr key={formula.id}><td className="table-cell font-black text-moss">{formula.code}</td><td className="table-cell">{formula.version}</td><td className="table-cell">{formula.name}</td><td className="table-cell">{formula.client_brand_name ?? '—'}</td><td className="table-cell">{formula.product_name ?? '—'}</td><td className="table-cell">{formula.total_percentage.toFixed(2)}%</td><td className="table-cell"><Money value={formula.total_cost} /></td><td className="table-cell">{formula.status}</td><td className="table-cell"><div className="flex gap-2"><form action={duplicateEngineeringFormulaAction}><input type="hidden" name="formulaId" value={formula.id} /><button className="btn-secondary"><Copy size={14} />Duplicar</button></form><form action={approveEngineeringFormulaAction}><input type="hidden" name="formulaId" value={formula.id} /><button className="btn-secondary"><CheckCircle2 size={14} />Aprovar</button></form></div></td></tr>)}</tbody></table></div></section>
+
+
+    <section className="grid gap-6 xl:grid-cols-2">
+      <div className="panel overflow-hidden"><div className="border-b border-line px-5 py-4"><h2 className="text-lg font-black text-ink">Fila de Precificação</h2><p className="text-sm text-slate-600">Recebe custos de MP e embalagem calculados pela Engenharia.</p></div><div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm"><thead><tr className="table-head"><th className="px-4 py-3">Fórmula</th><th className="px-4 py-3">MP</th><th className="px-4 py-3">Embalagem</th><th className="px-4 py-3">Industrial</th><th className="px-4 py-3">Ação</th></tr></thead><tbody>{pricingRequests.map((request) => <tr key={request.id}><td className="table-cell font-black text-ink">{request.formula_name}</td><td className="table-cell"><Money value={request.raw_material_cost} /></td><td className="table-cell"><Money value={request.packaging_cost} /></td><td className="table-cell"><Money value={request.industrial_cost} /></td><td className="table-cell"><form action={createProposalFromPricingAction}><input type="hidden" name="pricingRequestId" value={request.id} /><button className="btn-secondary">Montar proposta</button></form></td></tr>)}</tbody></table></div></div>
+      <div className="panel overflow-hidden"><div className="border-b border-line px-5 py-4"><h2 className="text-lg font-black text-ink">Propostas · Modo Cliente · PDF · Enviar</h2><p className="text-sm text-slate-600">Estrutura inicial para receber precificação e dados do cliente.</p></div><div className="divide-y divide-line">{proposals.map((proposal) => <div key={proposal.id} className="p-4"><p className="font-black text-ink">{proposal.title}</p><p className="text-sm text-slate-600">{proposal.client_brand_name} · {proposal.customer_mode} · PDF {proposal.pdf_status} · {proposal.send_status}</p></div>)}</div></div>
+    </section>
   </div>;
 }

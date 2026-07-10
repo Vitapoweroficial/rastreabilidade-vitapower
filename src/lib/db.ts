@@ -176,5 +176,58 @@ export function migrate(database: Database.Database = db) {
     CREATE INDEX IF NOT EXISTS idx_packaging_code ON packaging_materials(internal_code);
     CREATE INDEX IF NOT EXISTS idx_formulas_code_version ON engineering_formulas(code, version);
     CREATE INDEX IF NOT EXISTS idx_formula_items_formula ON formula_items(formula_id);
+
+    CREATE TABLE IF NOT EXISTS engineering_projects (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_id INTEGER NOT NULL,
+      product_id INTEGER,
+      name TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'Novo projeto',
+      briefing TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE RESTRICT,
+      FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS formula_packaging_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      formula_id INTEGER NOT NULL,
+      packaging_material_id INTEGER NOT NULL,
+      quantity REAL NOT NULL DEFAULT 1,
+      cost REAL NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (formula_id) REFERENCES engineering_formulas(id) ON DELETE CASCADE,
+      FOREIGN KEY (packaging_material_id) REFERENCES packaging_materials(id) ON DELETE RESTRICT
+    );
+
+    CREATE TABLE IF NOT EXISTS pricing_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      formula_id INTEGER NOT NULL,
+      project_id INTEGER,
+      raw_material_cost REAL NOT NULL DEFAULT 0,
+      packaging_cost REAL NOT NULL DEFAULT 0,
+      industrial_cost REAL NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'Enviado para precificacao',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (formula_id) REFERENCES engineering_formulas(id) ON DELETE CASCADE,
+      FOREIGN KEY (project_id) REFERENCES engineering_projects(id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS commercial_proposals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      pricing_request_id INTEGER NOT NULL,
+      client_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      customer_mode TEXT NOT NULL DEFAULT 'rascunho',
+      pdf_status TEXT NOT NULL DEFAULT 'pendente',
+      send_status TEXT NOT NULL DEFAULT 'nao_enviado',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (pricing_request_id) REFERENCES pricing_requests(id) ON DELETE CASCADE,
+      FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE RESTRICT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_engineering_projects_client ON engineering_projects(client_id);
+    CREATE INDEX IF NOT EXISTS idx_formula_packaging_formula ON formula_packaging_items(formula_id);
+    CREATE INDEX IF NOT EXISTS idx_pricing_requests_formula ON pricing_requests(formula_id);
   `);
 }

@@ -632,3 +632,79 @@ export function getEngineeringDashboard() {
   const formulaCount = (db.prepare(`SELECT COUNT(*) AS total FROM engineering_formulas`).get() as { total: number }).total;
   return { rawMaterialCount, packagingCount, supplierCount, formulaCount };
 }
+
+type EngineeringProjectRow = { id: number; client_id: number; client_brand_name: string; product_id: number | null; product_name: string | null; name: string; status: string; briefing: string | null; created_at: string };
+type FormulaPackagingRow = { id: number; formula_id: number; packaging_material_id: number; packaging_name: string; packaging_code: string; category: string; quantity: number; cost: number };
+type PricingRequestRow = { id: number; formula_id: number; formula_name: string; project_id: number | null; raw_material_cost: number; packaging_cost: number; industrial_cost: number; status: string; created_at: string };
+type CommercialProposalRow = { id: number; pricing_request_id: number; client_id: number; client_brand_name: string; title: string; customer_mode: string; pdf_status: string; send_status: string; created_at: string };
+
+export function listEngineeringProjects() {
+  return db.prepare(`
+    SELECT engineering_projects.*, clients.brand_name AS client_brand_name, products.name AS product_name
+    FROM engineering_projects
+    INNER JOIN clients ON clients.id = engineering_projects.client_id
+    LEFT JOIN products ON products.id = engineering_projects.product_id
+    ORDER BY engineering_projects.created_at DESC, engineering_projects.id DESC
+  `).all() as EngineeringProjectRow[];
+}
+
+export function createEngineeringProject(input: { clientId: number; productId?: number | null; name: string; briefing?: string | null }) {
+  db.prepare(`INSERT INTO engineering_projects (client_id, product_id, name, briefing) VALUES (?, ?, ?, ?)`)
+    .run(input.clientId, input.productId || null, required(input.name, "Nome do projeto"), optional(input.briefing));
+}
+
+export function listFormulaPackagingItems(formulaId: number) {
+  return db.prepare(`
+    SELECT formula_packaging_items.*, packaging_materials.name AS packaging_name, packaging_materials.internal_code AS packaging_code, packaging_materials.category
+    FROM formula_packaging_items
+    INNER JOIN packaging_materials ON packaging_materials.id = formula_packaging_items.packaging_material_id
+    WHERE formula_packaging_items.formula_id = ?
+    ORDER BY packaging_materials.category ASC
+  `).all(formulaId) as FormulaPackagingRow[];
+}
+
+export function addFormulaPackagingItem(input: { formulaId: number; packagingMaterialId: number; quantity: number }) {
+  const packaging = db.prepare(`SELECT unit_cost FROM packaging_materials WHERE id = ?`).get(input.packagingMaterialId) as { unit_cost: number } | undefined;
+  if (!packaging) throw new Error("Embalagem nao encontrada.");
+  const quantity = Number(input.quantity || 1);
+  db.prepare(`INSERT INTO formula_packaging_items (formula_id, packaging_material_id, quantity, cost) VALUES (?, ?, ?, ?)`)
+    .run(input.formulaId, input.packagingMaterialId, quantity, quantity * Number(packaging.unit_cost || 0));
+}
+
+export function sendFormulaToPricing(input: { formulaId: number; projectId?: number | null }) {
+  const raw = db.prepare(`SELECT COALESCE(SUM(cost), 0) AS total FROM formula_items WHERE formula_id = ?`).get(input.formulaId) as { total: number };
+  const pack = db.prepare(`SELECT COALESCE(SUM(cost), 0) AS total FROM formula_packaging_items WHERE formula_id = ?`).get(input.formulaId) as { total: number };
+  db.prepare(`INSERT INTO pricing_requests (formula_id, project_id, raw_material_cost, packaging_cost, industrial_cost) VALUES (?, ?, ?, ?, ?)`)
+    .run(input.formulaId, input.projectId || null, raw.total, pack.total, raw.total + pack.total);
+}
+
+export function listPricingRequests() {
+  return db.prepare(`
+    SELECT pricing_requests.*, engineering_formulas.name AS formula_name
+    FROM pricing_requests
+    INNER JOIN engineering_formulas ON engineering_formulas.id = pricing_requests.formula_id
+    ORDER BY pricing_requests.created_at DESC, pricing_requests.id DESC
+  `).all() as PricingRequestRow[];
+}
+
+export function createProposalFromPricing(pricingRequestId: number) {
+  const row = db.prepare(`
+    SELECT pricing_requests.id, engineering_formulas.name AS formula_name, COALESCE(engineering_formulas.client_id, engineering_projects.client_id) AS client_id
+    FROM pricing_requests
+    INNER JOIN engineering_formulas ON engineering_formulas.id = pricing_requests.formula_id
+    LEFT JOIN engineering_projects ON engineering_projects.id = pricing_requests.project_id
+    WHERE pricing_requests.id = ?
+  `).get(pricingRequestId) as { id: number; formula_name: string; client_id: number | null } | undefined;
+  if (!row?.client_id) throw new Error("Solicitacao de precificacao sem cliente vinculado.");
+  db.prepare(`INSERT INTO commercial_proposals (pricing_request_id, client_id, title, customer_mode, pdf_status, send_status) VALUES (?, ?, ?, 'modo_cliente', 'gerado', 'pronto_para_envio')`)
+    .run(pricingRequestId, row.client_id, `Proposta comercial - ${row.formula_name}`);
+}
+
+export function listCommercialProposals() {
+  return db.prepare(`
+    SELECT commercial_proposals.*, clients.brand_name AS client_brand_name
+    FROM commercial_proposals
+    INNER JOIN clients ON clients.id = commercial_proposals.client_id
+    ORDER BY commercial_proposals.created_at DESC, commercial_proposals.id DESC
+  `).all() as CommercialProposalRow[];
+}

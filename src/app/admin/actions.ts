@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { addFormulaItem, approveEngineeringFormula, createClient, createEngineeringFormula, createEngineeringSupplier, createLot, createPackagingMaterial, createProduct, createRawMaterial, duplicateEngineeringFormula } from "@/lib/repository";
+import { addFormulaItem, addFormulaPackagingItem, approveEngineeringFormula, createClient, createEngineeringFormula, createEngineeringProject, createEngineeringSupplier, createLot, createPackagingMaterial, createProduct, createProposalFromPricing, createRawMaterial, duplicateEngineeringFormula, sendFormulaToPricing } from "@/lib/repository";
 import type { LotStatus } from "@/lib/types";
 
 function text(formData: FormData, key: string) {
@@ -149,5 +149,38 @@ export async function duplicateEngineeringFormulaAction(formData: FormData) {
 
 export async function approveEngineeringFormulaAction(formData: FormData) {
   approveEngineeringFormula(numberValue(formData, "formulaId"));
+  revalidatePath("/admin/engenharia");
+}
+
+
+export async function createEngineeringProjectAction(formData: FormData) {
+  createEngineeringProject({
+    clientId: numberValue(formData, "clientId"),
+    productId: numberValue(formData, "productId"),
+    name: text(formData, "name"),
+    briefing: nullableText(formData, "briefing")
+  });
+  revalidatePath("/admin/engenharia");
+}
+
+export async function addFormulaPackagingItemAction(formData: FormData) {
+  addFormulaPackagingItem({
+    formulaId: numberValue(formData, "formulaId"),
+    packagingMaterialId: numberValue(formData, "packagingMaterialId"),
+    quantity: numberValue(formData, "quantity") || 1
+  });
+  revalidatePath("/admin/engenharia");
+}
+
+export async function sendFormulaToPricingAction(formData: FormData) {
+  sendFormulaToPricing({
+    formulaId: numberValue(formData, "formulaId"),
+    projectId: numberValue(formData, "projectId")
+  });
+  revalidatePath("/admin/engenharia");
+}
+
+export async function createProposalFromPricingAction(formData: FormData) {
+  createProposalFromPricing(numberValue(formData, "pricingRequestId"));
   revalidatePath("/admin/engenharia");
 }
