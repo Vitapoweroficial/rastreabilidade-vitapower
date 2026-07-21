@@ -14,43 +14,26 @@ export function seedDemoData(database: Database.Database, options: SeedOptions =
   }
 
   const seed = database.transaction(() => {
-    database.exec(`
-      DELETE FROM lots;
-      DELETE FROM pricing_models;
-      DELETE FROM formula_items;
-      DELETE FROM formulas;
-      DELETE FROM raw_materials;
-      DELETE FROM packaging_materials;
-      DELETE FROM suppliers;
-      DELETE FROM projects;
-      DELETE FROM client_contacts;
-      DELETE FROM products;
-      DELETE FROM clients;
-    `);
-
-    const hasSqliteSequence = database
-      .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'sqlite_sequence'")
-      .get();
-
-    if (hasSqliteSequence) {
-      database
-        .prepare(`
-          DELETE FROM sqlite_sequence
-          WHERE name IN (
-            'clients',
-            'products',
-            'lots',
-            'client_contacts',
-            'projects',
-            'suppliers',
-            'raw_materials',
-            'packaging_materials',
-            'formulas',
-            'formula_items',
-            'pricing_models'
-          )
-        `)
-        .run();
+    if (options.reset) {
+      database.exec(`
+        DELETE FROM commercial_proposals;
+        DELETE FROM pricing_requests;
+        DELETE FROM formula_packaging_items;
+        DELETE FROM formula_items;
+        DELETE FROM engineering_formulas;
+        DELETE FROM engineering_projects;
+        DELETE FROM pricing_models;
+        DELETE FROM formulas;
+        DELETE FROM packaging_materials;
+        DELETE FROM raw_materials;
+        DELETE FROM engineering_suppliers;
+        DELETE FROM suppliers;
+        DELETE FROM projects;
+        DELETE FROM client_contacts;
+        DELETE FROM lots;
+        DELETE FROM products;
+        DELETE FROM clients;
+      `);
     }
 
     const insertClient = database.prepare(`
@@ -98,7 +81,7 @@ export function seedDemoData(database: Database.Database, options: SeedOptions =
       "VPW-CREA-300",
       "Creatina Monohidratada 300g",
       "Performance",
-      "Creatina monohidratada com rastreabilidade por lote e controle de liberação.",
+      "Creatina monohidratada com rastreabilidade por lote e controle de liberacao.",
       "F-2026.03",
       1
     ).lastInsertRowid;
@@ -144,89 +127,6 @@ export function seedDemoData(database: Database.Database, options: SeedOptions =
       "Aguardando conclusao da analise microbiologica.",
       "Retencao de amostras realizada em 2026-05-04."
     );
-
-    database.prepare(`
-      INSERT INTO client_contacts (client_id, name, role, email, phone, is_primary)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(nutriAlfa, "Marina Costa", "Compras e novos projetos", "marina@nutrialfa.com.br", "(11) 98888-0101", 1);
-
-    const project = database.prepare(`
-      INSERT INTO projects (client_id, code, name, project_type, status, priority, expected_delivery_date, estimated_revenue_cents, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      nutriAlfa,
-      "PL-2026-001",
-      "Linha premium de whey 900g",
-      "private_label",
-      "formula_pricing",
-      "high",
-      "2026-08-20",
-      18400000,
-      "Projeto piloto para estruturar briefing, formula, precificacao e aprovacao do cliente."
-    ).lastInsertRowid;
-
-    const supplier = database.prepare(`
-      INSERT INTO suppliers (name, tax_id, contact_name, email, phone, supplier_type, active)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      "Insumos Premium Brasil",
-      "33.444.555/0001-66",
-      "Carla Mendes",
-      "comercial@insumospremium.example",
-      "(11) 96666-0303",
-      "raw_material",
-      1
-    ).lastInsertRowid;
-
-    const protein = database.prepare(`
-      INSERT INTO raw_materials (internal_code, name, category, unit, supplier_id, last_cost_cents, allergen_notes, active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      "MP-WPC-80",
-      "Whey Protein Concentrado 80%",
-      "Proteinas",
-      "kg",
-      supplier,
-      6850,
-      "Contem derivados de leite.",
-      1
-    ).lastInsertRowid;
-
-    database.prepare(`
-      INSERT INTO packaging_materials (internal_code, name, packaging_type, unit, supplier_id, last_cost_cents, active)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run("EMB-POTE-900-PR", "Pote preto 900g com tampa", "pote", "un", supplier, 420, 1);
-
-    const formula = database.prepare(`
-      INSERT INTO formulas (product_id, project_id, code, version, name, batch_yield_quantity, batch_yield_unit, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(whey, project, "F-WHEY-BAU", "2026.01", "Whey Protein Baunilha 900g", 2400, "un", "approved").lastInsertRowid;
-
-    database.prepare(`
-      INSERT INTO formula_items (formula_id, raw_material_id, quantity, unit, loss_percentage)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(formula, protein, 720, "kg", 1.5);
-
-    database.prepare(`
-      INSERT INTO pricing_models (
-        product_id,
-        project_id,
-        formula_id,
-        name,
-        raw_material_cost_cents,
-        packaging_cost_cents,
-        labor_cost_cents,
-        tax_cents,
-        card_fee_cents,
-        representative_commission_cents,
-        freight_cents,
-        loss_margin_percentage,
-        contribution_margin_percentage,
-        final_price_cents,
-        status
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(whey, project, formula, "Precificacao lote piloto 2400 un", 4932000, 1008000, 720000, 980000, 230000, 450000, 360000, 2.2, 31.5, 18400000, "draft");
   });
 
   seed();
