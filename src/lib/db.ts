@@ -87,7 +87,6 @@ export function migrate(database: Database.Database = db) {
     CREATE INDEX IF NOT EXISTS idx_lots_status ON lots(status);
     CREATE INDEX IF NOT EXISTS idx_lots_expiration_date ON lots(expiration_date);
 
-
     CREATE TABLE IF NOT EXISTS engineering_suppliers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
