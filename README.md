@@ -1,6 +1,6 @@
 # Rastreabilidade Vita Power
 
-Sistema de rastreabilidade de lotes para clientes private label.
+Sistema de rastreabilidade e workspace industrial da Vita Power Nutrition.
 
 ## Stack
 
@@ -27,6 +27,9 @@ export PATH="$PWD/.tools/node/current/bin:$PATH"
 Acesse:
 
 - Admin: http://localhost:3000/admin
+- Engenharia: http://localhost:3000/admin/engenharia
+- Private Label: http://localhost:3000/admin/modulos/private-label
+- Questionário Private Label: http://localhost:3000/admin/modulos/private-label/questionario
 - Consulta pública: http://localhost:3000/lote/VPW-2026-001
 
 ## Variáveis
@@ -40,11 +43,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 Em produção na Vercel, o MVP usa SQLite em memória com dados temporários de demonstração. Ele não cria a pasta `data/`, não escreve em disco e não persiste cadastros entre instâncias serverless.
 
-## Arquitetura estratégica
-
-A visão modular para evolução do MVP em sistema operacional da Vita Power está documentada em `docs/architecture.md`.
-
-## Funcionalidades do MVP
+## Funcionalidades
 
 - Cadastro de clientes private label
 - Cadastro de produtos vinculados ao cliente
@@ -52,3 +51,5 @@ A visão modular para evolução do MVP em sistema operacional da Vita Power est
 - Geração de QR Code por lote
 - Página pública de consulta do lote
 - Dashboard administrativo com indicadores e lotes recentes
+- Módulo Engenharia para fornecedores, matérias-primas, embalagens, fórmulas, projetos, precificação e propostas
+- Módulo Private Label com questionário nativo, salvamento local, resumo e impressão/PDF
