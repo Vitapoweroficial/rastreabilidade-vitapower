@@ -418,6 +418,21 @@ export function getDashboardStats(): DashboardStats {
        WHERE expiration_date BETWEEN date('now') AND date('now', '+45 day')`
     )
     .get() as { total: number };
+  const activeProjects = db
+    .prepare("SELECT COUNT(*) AS total FROM projects WHERE status NOT IN ('delivered', 'cancelled')")
+    .get() as { total: number };
+  const rawMaterials = db
+    .prepare("SELECT COUNT(*) AS total FROM raw_materials WHERE active = 1")
+    .get() as { total: number };
+  const packagingMaterials = db
+    .prepare("SELECT COUNT(*) AS total FROM packaging_materials WHERE active = 1")
+    .get() as { total: number };
+  const formulas = db
+    .prepare("SELECT COUNT(*) AS total FROM formulas")
+    .get() as { total: number };
+  const pricingModels = db
+    .prepare("SELECT COUNT(*) AS total FROM pricing_models")
+    .get() as { total: number };
 
   return {
     activeClients: activeClients.total,
@@ -425,7 +440,12 @@ export function getDashboardStats(): DashboardStats {
     totalLots: totalLots.total,
     releasedLots: releasedLots.total,
     quarantineLots: quarantineLots.total,
-    expiringLots: expiringLots.total
+    expiringLots: expiringLots.total,
+    activeProjects: activeProjects.total,
+    rawMaterials: rawMaterials.total,
+    packagingMaterials: packagingMaterials.total,
+    formulas: formulas.total,
+    pricingModels: pricingModels.total
   };
 }
 
