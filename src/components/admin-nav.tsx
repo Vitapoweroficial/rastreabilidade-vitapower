@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Boxes, PackageCheck, UsersRound } from "lucide-react";
+import { BarChart3, Beaker, Bot, Boxes, PackageCheck, UsersRound } from "lucide-react";
 
 const items = [
   { href: "/admin", label: "Dashboard", icon: BarChart3 },
   { href: "/admin/clientes", label: "Clientes", icon: UsersRound },
   { href: "/admin/produtos", label: "Produtos", icon: Boxes },
-  { href: "/admin/lotes", label: "Lotes", icon: PackageCheck }
+  { href: "/admin/engenharia", label: "Engenharia", icon: Beaker },
+  { href: "/admin/lotes", label: "Lotes", icon: PackageCheck },
+  { href: "/admin/vita-ia", label: "VITA IA", icon: Bot }
 ];
 
 export function AdminNav() {
