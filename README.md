@@ -1,27 +1,22 @@
-# Rastreabilidade Vita Power
+# Rastreabilidade Vita Power + VITA IA
 
 Sistema de rastreabilidade e workspace industrial da Vita Power Nutrition.
 
 ## Stack
 
-- Next.js com App Router
+- Next.js App Router
 - TypeScript
 - Tailwind CSS
 - SQLite com `better-sqlite3`
-- QR Code por lote em SVG
+- Bling API v3 via OAuth 2.0
+- OpenAI via API server-side
 
-## Como rodar
+## Instalação
 
 ```bash
 npm install
 npm run db:seed
 npm run dev
-```
-
-Se o terminal não tiver `node`/`npm` no PATH, use o Node local instalado em `.tools`:
-
-```bash
-export PATH="$PWD/.tools/node/current/bin:$PATH"
 ```
 
 Acesse:
@@ -32,16 +27,38 @@ Acesse:
 - Questionário Private Label: http://localhost:3000/admin/modulos/private-label/questionario
 - Consulta pública: http://localhost:3000/lote/VPW-2026-001
 
-## Variáveis
+## Configuração `.env.local`
 
-Crie um `.env.local` se quiser trocar o caminho do banco ou a URL pública:
+Copie `.env.example` para `.env.local`:
+
+```bash
+cp .env.example .env.local
+```
+
+Preencha:
 
 ```bash
 SQLITE_PATH=data/vitapower.db
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+OPENAI_API_KEY=
+BLING_CLIENT_ID=
+BLING_CLIENT_SECRET=
+BLING_REDIRECT_URI=http://localhost:3000/api/auth/bling/callback
 ```
 
-Em produção na Vercel, o MVP usa SQLite em memória com dados temporários de demonstração. Ele não cria a pasta `data/`, não escreve em disco e não persiste cadastros entre instâncias serverless.
+No aplicativo do Bling, cadastre exatamente a URL de redirecionamento configurada em `BLING_REDIRECT_URI`.
+
+## Fluxo de validação do Bling
+
+1. Rode `npm run dev`.
+2. Abra `http://localhost:3000/test/bling`.
+3. Clique em **Autenticar no Bling**.
+4. Autorize o aplicativo no Bling.
+5. Ao retornar, use os botões de teste para consultar produtos, pedidos, estoque e ordens de produção.
+
+Os tokens ficam salvos apenas no SQLite no servidor, na tabela `bling_oauth_tokens`, e não são expostos no frontend.
+
+## Endpoints implementados
 
 ## Funcionalidades
 

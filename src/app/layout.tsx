@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
-  title: "Rastreabilidade Vita Power",
-  description: "MVP de rastreabilidade de lotes para clientes private label."
+  title: "Vita Power Workspace",
+  description: "ERP industrial e workspace central da Vita Power Nutrition."
 };
 
 export default function RootLayout({
