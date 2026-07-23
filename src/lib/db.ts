@@ -87,16 +87,6 @@ export function migrate(database: Database.Database = db) {
     CREATE INDEX IF NOT EXISTS idx_lots_status ON lots(status);
     CREATE INDEX IF NOT EXISTS idx_lots_expiration_date ON lots(expiration_date);
 
-    CREATE TABLE IF NOT EXISTS bling_oauth_tokens (
-      id INTEGER PRIMARY KEY CHECK (id = 1),
-      access_token TEXT NOT NULL,
-      refresh_token TEXT,
-      expires_at TEXT NOT NULL,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
-
     CREATE TABLE IF NOT EXISTS engineering_suppliers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
@@ -125,6 +115,7 @@ export function migrate(database: Database.Database = db) {
       expiration_date TEXT,
       technical_specification TEXT,
       status TEXT NOT NULL CHECK (status IN ('Ativo', 'Inativo')) DEFAULT 'Ativo',
+      active INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (primary_supplier_id) REFERENCES engineering_suppliers(id) ON DELETE SET NULL,
       FOREIGN KEY (secondary_supplier_id) REFERENCES engineering_suppliers(id) ON DELETE SET NULL
@@ -143,6 +134,7 @@ export function migrate(database: Database.Database = db) {
       manufacturer TEXT,
       technical_specification TEXT,
       status TEXT NOT NULL CHECK (status IN ('Ativo', 'Inativo')) DEFAULT 'Ativo',
+      active INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (supplier_id) REFERENCES engineering_suppliers(id) ON DELETE SET NULL
     );
@@ -235,6 +227,15 @@ export function migrate(database: Database.Database = db) {
       FOREIGN KEY (pricing_request_id) REFERENCES pricing_requests(id) ON DELETE CASCADE,
       FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE RESTRICT
     );
+
+    CREATE VIEW IF NOT EXISTS projects AS
+      SELECT * FROM engineering_projects;
+
+    CREATE VIEW IF NOT EXISTS formulas AS
+      SELECT * FROM engineering_formulas;
+
+    CREATE VIEW IF NOT EXISTS pricing_models AS
+      SELECT * FROM pricing_requests;
 
     CREATE INDEX IF NOT EXISTS idx_engineering_projects_client ON engineering_projects(client_id);
     CREATE INDEX IF NOT EXISTS idx_formula_packaging_formula ON formula_packaging_items(formula_id);
