@@ -1,7 +1,22 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { addFormulaItem, addFormulaPackagingItem, approveEngineeringFormula, createClient, createEngineeringFormula, createEngineeringProject, createEngineeringSupplier, createLot, createPackagingMaterial, createProduct, createProposalFromPricing, createRawMaterial, duplicateEngineeringFormula, sendFormulaToPricing } from "@/lib/repository";
+import {
+  addFormulaItem,
+  addFormulaPackagingItem,
+  approveEngineeringFormula,
+  createClient,
+  createEngineeringFormula,
+  createEngineeringProject,
+  createEngineeringSupplier,
+  createLot,
+  createPackagingMaterial,
+  createProduct,
+  createProposalFromPricing,
+  createRawMaterial,
+  duplicateEngineeringFormula,
+  sendFormulaToPricing
+} from "@/lib/repository";
 import type { LotStatus } from "@/lib/types";
 
 function text(formData: FormData, key: string) {
@@ -18,7 +33,7 @@ function numberValue(formData: FormData, key: string) {
 }
 
 export async function createClientAction(formData: FormData) {
-  createClient({
+  await createClient({
     brandName: text(formData, "brandName"),
     legalName: text(formData, "legalName"),
     taxId: nullableText(formData, "taxId"),
@@ -33,7 +48,7 @@ export async function createClientAction(formData: FormData) {
 }
 
 export async function createProductAction(formData: FormData) {
-  createProduct({
+  await createProduct({
     clientId: numberValue(formData, "clientId"),
     sku: text(formData, "sku"),
     name: text(formData, "name"),
@@ -48,7 +63,7 @@ export async function createProductAction(formData: FormData) {
 }
 
 export async function createLotAction(formData: FormData) {
-  createLot({
+  await createLot({
     productId: numberValue(formData, "productId"),
     code: text(formData, "code"),
     manufacturingDate: text(formData, "manufacturingDate"),
@@ -65,9 +80,8 @@ export async function createLotAction(formData: FormData) {
   revalidatePath("/admin/lotes");
 }
 
-
 export async function createEngineeringSupplierAction(formData: FormData) {
-  createEngineeringSupplier({
+  await createEngineeringSupplier({
     name: text(formData, "name"),
     contactName: nullableText(formData, "contactName"),
     email: nullableText(formData, "email"),
@@ -79,7 +93,7 @@ export async function createEngineeringSupplierAction(formData: FormData) {
 }
 
 export async function createRawMaterialAction(formData: FormData) {
-  createRawMaterial({
+  await createRawMaterial({
     name: text(formData, "name"),
     internalCode: text(formData, "internalCode"),
     category: nullableText(formData, "category"),
@@ -99,7 +113,7 @@ export async function createRawMaterialAction(formData: FormData) {
 }
 
 export async function createPackagingMaterialAction(formData: FormData) {
-  createPackagingMaterial({
+  await createPackagingMaterial({
     name: text(formData, "name"),
     internalCode: text(formData, "internalCode"),
     category: text(formData, "category"),
@@ -116,7 +130,7 @@ export async function createPackagingMaterialAction(formData: FormData) {
 }
 
 export async function createEngineeringFormulaAction(formData: FormData) {
-  createEngineeringFormula({
+  await createEngineeringFormula({
     name: text(formData, "name"),
     code: text(formData, "code"),
     version: text(formData, "version"),
@@ -130,7 +144,7 @@ export async function createEngineeringFormulaAction(formData: FormData) {
 }
 
 export async function addFormulaItemAction(formData: FormData) {
-  addFormulaItem({
+  await addFormulaItem({
     formulaId: numberValue(formData, "formulaId"),
     rawMaterialId: numberValue(formData, "rawMaterialId"),
     percentage: numberValue(formData, "percentage"),
@@ -143,18 +157,17 @@ export async function addFormulaItemAction(formData: FormData) {
 }
 
 export async function duplicateEngineeringFormulaAction(formData: FormData) {
-  duplicateEngineeringFormula(numberValue(formData, "formulaId"));
+  await duplicateEngineeringFormula(numberValue(formData, "formulaId"));
   revalidatePath("/admin/engenharia");
 }
 
 export async function approveEngineeringFormulaAction(formData: FormData) {
-  approveEngineeringFormula(numberValue(formData, "formulaId"));
+  await approveEngineeringFormula(numberValue(formData, "formulaId"));
   revalidatePath("/admin/engenharia");
 }
 
-
 export async function createEngineeringProjectAction(formData: FormData) {
-  createEngineeringProject({
+  await createEngineeringProject({
     clientId: numberValue(formData, "clientId"),
     productId: numberValue(formData, "productId"),
     name: text(formData, "name"),
@@ -164,7 +177,7 @@ export async function createEngineeringProjectAction(formData: FormData) {
 }
 
 export async function addFormulaPackagingItemAction(formData: FormData) {
-  addFormulaPackagingItem({
+  await addFormulaPackagingItem({
     formulaId: numberValue(formData, "formulaId"),
     packagingMaterialId: numberValue(formData, "packagingMaterialId"),
     quantity: numberValue(formData, "quantity") || 1
@@ -173,7 +186,7 @@ export async function addFormulaPackagingItemAction(formData: FormData) {
 }
 
 export async function sendFormulaToPricingAction(formData: FormData) {
-  sendFormulaToPricing({
+  await sendFormulaToPricing({
     formulaId: numberValue(formData, "formulaId"),
     projectId: numberValue(formData, "projectId")
   });
@@ -181,6 +194,6 @@ export async function sendFormulaToPricingAction(formData: FormData) {
 }
 
 export async function createProposalFromPricingAction(formData: FormData) {
-  createProposalFromPricing(numberValue(formData, "pricingRequestId"));
+  await createProposalFromPricing(numberValue(formData, "pricingRequestId"));
   revalidatePath("/admin/engenharia");
 }
