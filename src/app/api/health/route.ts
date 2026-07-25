@@ -9,14 +9,7 @@ const SMOKE_TAX_ID = "VP-NEON-PERSISTENCE-SMOKE";
 
 type QueryRow = Record<string, unknown>;
 
-export async function GET() {
-  return NextResponse.json({
-    ok: true,
-    stats: await getDashboardStats()
-  });
-}
-
-export async function POST(request: NextRequest) {
+async function runSmokeTest(request: NextRequest) {
   if (process.env.VERCEL_ENV !== "preview") {
     return NextResponse.json({ ok: false, error: "Smoke test available only in preview." }, { status: 403 });
   }
@@ -66,4 +59,19 @@ export async function POST(request: NextRequest) {
     persisted: rows.length === 1,
     row: rows[0] ?? null
   });
+}
+
+export async function GET(request: NextRequest) {
+  if (request.nextUrl.searchParams.has("mode")) {
+    return runSmokeTest(request);
+  }
+
+  return NextResponse.json({
+    ok: true,
+    stats: await getDashboardStats()
+  });
+}
+
+export async function POST(request: NextRequest) {
+  return runSmokeTest(request);
 }
