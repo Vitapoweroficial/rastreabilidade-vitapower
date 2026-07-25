@@ -7,6 +7,8 @@ export const dynamic = "force-dynamic";
 
 const SMOKE_TAX_ID = "VP-NEON-PERSISTENCE-SMOKE";
 
+type QueryRow = Record<string, unknown>;
+
 export async function GET() {
   return NextResponse.json({
     ok: true,
@@ -25,7 +27,7 @@ export async function POST(request: NextRequest) {
 
   if (mode === "create") {
     await sql.query("DELETE FROM clients WHERE tax_id = $1", [SMOKE_TAX_ID]);
-    const rows = await sql.query(
+    const rows = (await sql.query(
       `INSERT INTO clients (brand_name, legal_name, tax_id, contact_name, email, phone, active)
        VALUES ($1, $2, $3, $4, $5, $6, FALSE)
        RETURNING id, created_at`,
@@ -37,24 +39,27 @@ export async function POST(request: NextRequest) {
         "smoke-test@vitapower.local",
         null
       ]
-    );
+    )) as unknown as QueryRow[];
 
     return NextResponse.json({ ok: true, created: true, row: rows[0] ?? null });
   }
 
   if (mode === "cleanup") {
-    const rows = await sql.query("DELETE FROM clients WHERE tax_id = $1 RETURNING id", [SMOKE_TAX_ID]);
+    const rows = (await sql.query(
+      "DELETE FROM clients WHERE tax_id = $1 RETURNING id",
+      [SMOKE_TAX_ID]
+    )) as unknown as QueryRow[];
     return NextResponse.json({ ok: true, cleaned: rows.length });
   }
 
-  const rows = await sql.query(
+  const rows = (await sql.query(
     `SELECT id, brand_name, legal_name, tax_id, created_at
      FROM clients
      WHERE tax_id = $1
      ORDER BY id DESC
      LIMIT 1`,
     [SMOKE_TAX_ID]
-  );
+  )) as unknown as QueryRow[];
 
   return NextResponse.json({
     ok: true,
