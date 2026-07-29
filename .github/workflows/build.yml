@@ -37,3 +37,38 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify Neon persistence on Vercel preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_URL="https://rastreabilidade-vitapower-git-8e9e6b-vitapoweroficials-projects.vercel.app/api/health"
+          created=false
+
+          cleanup() {
+            curl -L -sS "${BASE_URL}?mode=cleanup" > cleanup.json || true
+          }
+          trap cleanup EXIT
+
+          for attempt in $(seq 1 36); do
+            http_code=$(curl -L -sS -o create.json -w "%{http_code}" "${BASE_URL}?mode=create" || true)
+            if [ "$http_code" = "200" ] && node -e 'const fs=require("fs"); const value=JSON.parse(fs.readFileSync("create.json","utf8")); if(value.ok!==true || value.created!==true) process.exit(1)'; then
+              created=true
+              break
+            fi
+            echo "Preview ainda não está pronto para o teste de persistência (tentativa ${attempt}/36)."
+            sleep 10
+          done
+
+          if [ "$created" != "true" ]; then
+            echo "Não foi possível criar o registro de teste no preview."
+            cat create.json || true
+            exit 1
+          fi
+
+          curl -L -fsS "${BASE_URL}?mode=verify" > verify.json
+          node -e 'const fs=require("fs"); const value=JSON.parse(fs.readFileSync("verify.json","utf8")); if(value.ok!==true || value.persisted!==true || !value.row) { console.error(value); process.exit(1); }'
+
+          curl -L -fsS "${BASE_URL}?mode=cleanup" > cleanup.json
+          node -e 'const fs=require("fs"); const value=JSON.parse(fs.readFileSync("cleanup.json","utf8")); if(value.ok!==true || Number(value.cleaned)<1) { console.error(value); process.exit(1); }'
+          trap - EXIT
