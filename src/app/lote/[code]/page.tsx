@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PublicLotPage({ params }: PageProps) {
   const { code } = await params;
-  const lot = getPublicLotByCode(code);
+  const lot = await getPublicLotByCode(code);
 
   if (!lot) {
     return (

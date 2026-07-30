@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest, { params }: RouteContext) {
   const { code } = await params;
-  const lot = getPublicLotByCode(code);
+  const lot = await getPublicLotByCode(code);
 
   if (!lot) {
     return NextResponse.json({ error: "Lote nao encontrado" }, { status: 404 });

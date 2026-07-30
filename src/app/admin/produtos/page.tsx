@@ -4,9 +4,8 @@ import { formatDateTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminProductsPage() {
-  const clients = listActiveClients();
-  const products = listProducts();
+export default async function AdminProductsPage() {
+  const [clients, products] = await Promise.all([listActiveClients(), listProducts()]);
 
   return (
     <div className="space-y-8">

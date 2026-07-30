@@ -8,8 +8,8 @@ import { formatDate, formatQuantity } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminDashboardPage() {
-  const { stats, recentLots } = getDashboardData();
+export default async function AdminDashboardPage() {
+  const { stats, recentLots } = await getDashboardData();
 
   return (
     <div className="space-y-8">
@@ -39,7 +39,7 @@ export default function AdminDashboardPage() {
             <p className="text-xs font-black uppercase tracking-[0.2em] text-red-100">Status da fundação</p>
             <div className="mt-5 space-y-4">
               <FoundationItem label="Rastreabilidade" value="Preservada" />
-              <FoundationItem label="Banco industrial" value="Estrutura inicial" />
+              <FoundationItem label="Banco industrial" value="Neon Postgres" />
               <FoundationItem label="Módulos" value={`${workspaceModules.length} domínios`} />
               <FoundationItem label="Arquitetura" value="Documentada" />
             </div>

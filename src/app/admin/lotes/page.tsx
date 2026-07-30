@@ -8,9 +8,8 @@ import { formatDate, formatQuantity } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminLotsPage() {
-  const products = listActiveProducts();
-  const lots = listLots();
+export default async function AdminLotsPage() {
+  const [products, lots] = await Promise.all([listActiveProducts(), listLots()]);
 
   return (
     <div className="space-y-8">

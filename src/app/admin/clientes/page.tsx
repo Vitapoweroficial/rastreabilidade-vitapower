@@ -4,8 +4,8 @@ import { formatDateTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminClientsPage() {
-  const clients = listClients();
+export default async function AdminClientsPage() {
+  const clients = await listClients();
 
   return (
     <div className="space-y-8">
