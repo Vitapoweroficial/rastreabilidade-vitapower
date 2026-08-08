@@ -26,16 +26,43 @@ await writer.query(`
 `);
 
 await writer.query("INSERT INTO deployment_health_checks (marker) VALUES ($1)", [marker]);
-
 const persistedRows = await reader.query("SELECT marker FROM deployment_health_checks WHERE marker = $1", [marker]);
 if (persistedRows.length !== 1 || persistedRows[0]?.marker !== marker) {
   throw new Error("Neon persistence verification failed: inserted marker was not readable from a separate connection.");
 }
-
 await cleaner.query("DELETE FROM deployment_health_checks WHERE marker = $1", [marker]);
 const remainingRows = await reader.query("SELECT marker FROM deployment_health_checks WHERE marker = $1", [marker]);
 if (remainingRows.length !== 0) {
   throw new Error("Neon persistence verification failed: cleanup did not persist.");
+}
+
+await writer.query(`
+  CREATE TABLE IF NOT EXISTS workspace_members (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE,
+    department TEXT NOT NULL,
+    role TEXT NOT NULL,
+    access_level TEXT NOT NULL DEFAULT 'membro',
+    permissions JSONB NOT NULL DEFAULT '[]'::jsonb,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )
+`);
+
+const memberToken = randomUUID();
+const memberRows = await writer.query(
+  `INSERT INTO workspace_members (name, email, department, role, access_level, permissions)
+   VALUES ($1, $2, 'Comercial', 'Validação de deploy', 'gestor', $3::jsonb)
+   RETURNING id`,
+  [`Deploy ${memberToken.slice(0, 8)}`, `deploy-${memberToken}@example.invalid`, JSON.stringify(["dashboard", "tarefas", "clientes", "private_label"])]
+);
+const memberId = memberRows[0]?.id;
+if (!memberId) throw new Error("Workspace member verification failed: member was not created.");
+const persistedMember = await reader.query(`SELECT access_level, permissions FROM workspace_members WHERE id = $1`, [memberId]);
+if (persistedMember[0]?.access_level !== "gestor" || !Array.isArray(persistedMember[0]?.permissions) || !persistedMember[0].permissions.includes("tarefas")) {
+  throw new Error("Workspace member verification failed: role or permissions did not persist.");
 }
 
 const taskKey = `task-build-${randomUUID()}`;
@@ -53,6 +80,7 @@ await writer.query(`
     read_at TIMESTAMPTZ,
     task_status TEXT NOT NULL DEFAULT 'novo',
     assignee TEXT,
+    assignee_member_id BIGINT REFERENCES workspace_members(id) ON DELETE SET NULL,
     due_at TIMESTAMPTZ,
     accepted_at TIMESTAMPTZ,
     completed_at TIMESTAMPTZ,
@@ -62,6 +90,7 @@ await writer.query(`
 `);
 await writer.query(`ALTER TABLE workspace_alerts ADD COLUMN IF NOT EXISTS task_status TEXT NOT NULL DEFAULT 'novo'`);
 await writer.query(`ALTER TABLE workspace_alerts ADD COLUMN IF NOT EXISTS assignee TEXT`);
+await writer.query(`ALTER TABLE workspace_alerts ADD COLUMN IF NOT EXISTS assignee_member_id BIGINT REFERENCES workspace_members(id) ON DELETE SET NULL`);
 await writer.query(`ALTER TABLE workspace_alerts ADD COLUMN IF NOT EXISTS due_at TIMESTAMPTZ`);
 await writer.query(`ALTER TABLE workspace_alerts ADD COLUMN IF NOT EXISTS accepted_at TIMESTAMPTZ`);
 await writer.query(`ALTER TABLE workspace_alerts ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ`);
@@ -81,21 +110,22 @@ await writer.query(
   `UPDATE workspace_alerts SET
      task_status = $2::text,
      assignee = $3::text,
-     due_at = $4::timestamptz,
-     accepted_at = CASE WHEN $3::text IS NOT NULL THEN COALESCE(accepted_at, NOW()) ELSE accepted_at END,
+     assignee_member_id = $4::bigint,
+     due_at = $5::timestamptz,
+     accepted_at = CASE WHEN $4::bigint IS NOT NULL THEN COALESCE(accepted_at, NOW()) ELSE accepted_at END,
      completed_at = CASE WHEN $2::text = 'concluido' THEN COALESCE(completed_at, NOW()) ELSE NULL END,
      read_at = COALESCE(read_at, NOW()),
      updated_at = NOW()
    WHERE id = $1`,
-  [taskId, "em_andamento", "Gabriel", dueAt]
+  [taskId, "em_andamento", `Deploy ${memberToken.slice(0, 8)}`, memberId, dueAt]
 );
 
 const assignedTask = await reader.query(
-  `SELECT task_status, assignee, due_at, accepted_at, read_at FROM workspace_alerts WHERE id = $1`,
+  `SELECT task_status, assignee, assignee_member_id, due_at, accepted_at, read_at FROM workspace_alerts WHERE id = $1`,
   [taskId]
 );
-if (assignedTask[0]?.task_status !== "em_andamento" || assignedTask[0]?.assignee !== "Gabriel" || !assignedTask[0]?.accepted_at || !assignedTask[0]?.read_at) {
-  throw new Error("Task verification failed: assignment/status did not persist.");
+if (assignedTask[0]?.task_status !== "em_andamento" || Number(assignedTask[0]?.assignee_member_id) !== Number(memberId) || !assignedTask[0]?.accepted_at || !assignedTask[0]?.read_at) {
+  throw new Error("Task verification failed: registered member assignment/status did not persist.");
 }
 
 await writer.query(
@@ -108,8 +138,11 @@ if (completedTask[0]?.task_status !== "concluido" || !completedTask[0]?.complete
 }
 
 await cleaner.query(`DELETE FROM workspace_alerts WHERE id = $1`, [taskId]);
+await cleaner.query(`DELETE FROM workspace_members WHERE id = $1`, [memberId]);
 const leftoverTask = await reader.query(`SELECT id FROM workspace_alerts WHERE id = $1`, [taskId]);
-if (leftoverTask.length !== 0) throw new Error("Task verification failed: cleanup did not persist.");
+const leftoverMember = await reader.query(`SELECT id FROM workspace_members WHERE id = $1`, [memberId]);
+if (leftoverTask.length !== 0 || leftoverMember.length !== 0) throw new Error("Workspace verification failed: cleanup did not persist.");
 
 console.log("Neon persistence verification passed across independent connections.");
-console.log("Workspace task verification passed: owner, deadline, status and completion persisted.");
+console.log("Workspace team verification passed: role and permissions persisted.");
+console.log("Workspace task verification passed: registered owner, deadline, status and completion persisted.");
