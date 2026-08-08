@@ -1,10 +1,17 @@
 import { AdminNav } from "@/components/admin-nav";
+import { WorkspaceAlertCenter } from "@/components/workspace-alert-center";
+import { getUnreadWorkspaceAlertCount, listWorkspaceAlerts } from "@/lib/workspace-alerts";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [alerts, unreadCount] = await Promise.all([
+    listWorkspaceAlerts(15),
+    getUnreadWorkspaceAlertCount()
+  ]);
+
   return (
     <div className="min-h-screen bg-[#f4f5f7] text-ink">
       <div className="mx-auto grid min-h-screen max-w-[1540px] grid-cols-1 lg:grid-cols-[296px_1fr]">
@@ -21,7 +28,10 @@ export default function AdminLayout({
           </div>
           <AdminNav />
         </aside>
-        <main className="px-5 py-6 sm:px-8 lg:px-10">{children}</main>
+        <main className="px-5 py-6 sm:px-8 lg:px-10">
+          <WorkspaceAlertCenter initialAlerts={alerts} initialUnreadCount={unreadCount} />
+          {children}
+        </main>
       </div>
     </div>
   );
