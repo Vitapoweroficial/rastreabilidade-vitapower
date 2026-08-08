@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { LucideIcon } from "lucide-react";
 import { ArrowLeft, Boxes, ClipboardList, FileText, FlaskConical, Mail, PackageCheck, Phone, Tags } from "lucide-react";
 import { formatDateTime } from "@/lib/format";
 import { getClientDNA } from "@/lib/private-label-repository";
 import { privateLabelStageProgress } from "@/lib/private-label-config";
 
 type PageProps = { params: Promise<{ id: string }> };
+type MetricCard = { label: string; value: number; icon: LucideIcon };
 
 function money(value: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -22,6 +24,13 @@ export default async function ClientDNAPage({ params }: PageProps) {
   if (!dna) notFound();
 
   const { client, products, projects, formulas, proposals, lots } = dna;
+  const metrics: MetricCard[] = [
+    { label: "Produtos", value: products.length, icon: Boxes },
+    { label: "Projetos", value: projects.length, icon: ClipboardList },
+    { label: "Fórmulas", value: formulas.length, icon: FlaskConical },
+    { label: "Propostas", value: proposals.length, icon: FileText },
+    { label: "Lotes", value: lots.length, icon: PackageCheck }
+  ];
 
   return (
     <div className="space-y-7 pb-8">
@@ -52,16 +61,10 @@ export default async function ClientDNAPage({ params }: PageProps) {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {[
-          ["Produtos", products.length, Boxes],
-          ["Projetos", projects.length, ClipboardList],
-          ["Fórmulas", formulas.length, FlaskConical],
-          ["Propostas", proposals.length, FileText],
-          ["Lotes", lots.length, PackageCheck]
-        ].map(([label, value, Icon]) => (
-          <div key={String(label)} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between"><div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-950 text-white"><Icon size={18} /></div><span className="text-2xl font-black">{String(value)}</span></div>
-            <p className="mt-3 text-sm font-bold text-slate-600">{String(label)}</p>
+        {metrics.map(({ label, value, icon: Icon }) => (
+          <div key={label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between"><div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-950 text-white"><Icon size={18} /></div><span className="text-2xl font-black">{value}</span></div>
+            <p className="mt-3 text-sm font-bold text-slate-600">{label}</p>
           </div>
         ))}
       </section>
