@@ -19,6 +19,7 @@ export type WorkspaceAlertView = {
   readAt: string | null;
   taskStatus: WorkspaceTaskStatus;
   assignee: string | null;
+  assigneeMemberId: number | null;
   dueAt: string | null;
   acceptedAt: string | null;
   completedAt: string | null;
