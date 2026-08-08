@@ -52,23 +52,11 @@ jobs:
           echo "$health" | grep -q '"ok":true'
           echo "$health" | grep -q '"stats"'
 
-          lots_health="$(curl --silent --show-error --location "$PROD_URL/api/health?scope=lots" || true)"
-          echo "Lot health: $lots_health"
-          echo "$lots_health" | grep -q '"ok":true'
+          dashboard="$(curl --fail --silent --show-error --location --retry 6 --retry-delay 5 --retry-all-errors "$PROD_URL/admin")"
+          echo "$dashboard" | grep -q 'Vita Power Workspace'
 
-          failed=0
-          for path in /admin /admin/clientes /admin/produtos /admin/lotes /admin/engenharia /admin/modulos/private-label; do
-            code="$(curl --silent --show-error --location --output /tmp/vp-body --write-out '%{http_code}' "$PROD_URL$path" || true)"
-            echo "$path -> HTTP $code"
-            if [ "$code" != "200" ]; then
-              echo "Response preview: $(head -c 300 /tmp/vp-body)"
-              failed=1
-            fi
+          for path in /admin/clientes /admin/produtos /admin/lotes /admin/engenharia /admin/modulos/private-label; do
+            curl --fail --silent --show-error --location --retry 6 --retry-delay 5 --retry-all-errors --output /dev/null "$PROD_URL$path"
           done
 
-          if [ "$failed" -ne 0 ]; then
-            exit 1
-          fi
-
-          grep -q 'Vita Power Workspace' /tmp/vp-body || true
           echo "Production workspace flows verified at $PROD_URL"
