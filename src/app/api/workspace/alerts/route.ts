@@ -16,6 +16,7 @@ export async function PATCH(request: Request) {
       action?: "read" | "task";
       taskStatus?: string;
       assignee?: string | null;
+      assigneeMemberId?: number | null;
       dueAt?: string | null;
     };
 
@@ -37,6 +38,7 @@ export async function PATCH(request: Request) {
         alertId,
         taskStatus: body.taskStatus as (typeof workspaceTaskStatuses)[number] | undefined,
         assignee: body.assignee,
+        assigneeMemberId: body.assigneeMemberId === undefined ? undefined : (body.assigneeMemberId === null ? null : Number(body.assigneeMemberId)),
         dueAt: body.dueAt
       });
       return NextResponse.json({ ok: true, task });
