@@ -47,36 +47,28 @@ jobs:
         run: |
           set -euo pipefail
 
-          candidates=(
-            "https://rastreabilidade-vitapower.vercel.app"
-            "https://rastreabilidade-vitapower-vitapoweroficials-projects.vercel.app"
-            "https://rastreabilidade-vitapower-git-main-vitapoweroficials-projects.vercel.app"
-          )
+          PROD_URL="https://rastreabilidade-vitapower.vercel.app"
+          health="$(curl --fail --silent --show-error --location --retry 6 --retry-delay 5 --retry-all-errors "$PROD_URL/api/health")"
+          echo "$health" | grep -q '"ok":true'
+          echo "$health" | grep -q '"stats"'
 
-          PROD_URL=""
-          for candidate in "${candidates[@]}"; do
-            body="$(curl --silent --show-error --location --max-time 20 "$candidate/api/health" || true)"
-            if echo "$body" | grep -q '"ok":true' && echo "$body" | grep -q '"stats"'; then
-              PROD_URL="$candidate"
-              break
-            fi
-          done
-
-          if [ -z "$PROD_URL" ]; then
-            echo "No healthy production alias found." >&2
-            exit 1
-          fi
-
-          echo "Healthy production alias: $PROD_URL"
           lots_health="$(curl --silent --show-error --location "$PROD_URL/api/health?scope=lots" || true)"
           echo "Lot health: $lots_health"
           echo "$lots_health" | grep -q '"ok":true'
 
-          dashboard="$(curl --fail --silent --show-error --location --retry 6 --retry-delay 5 --retry-all-errors "$PROD_URL/admin")"
-          echo "$dashboard" | grep -q 'Vita Power Workspace'
-
-          for path in /admin/clientes /admin/produtos /admin/lotes /admin/engenharia /admin/modulos/private-label; do
-            curl --fail --silent --show-error --location --retry 6 --retry-delay 5 --retry-all-errors --output /dev/null "$PROD_URL$path"
+          failed=0
+          for path in /admin /admin/clientes /admin/produtos /admin/lotes /admin/engenharia /admin/modulos/private-label; do
+            code="$(curl --silent --show-error --location --output /tmp/vp-body --write-out '%{http_code}' "$PROD_URL$path" || true)"
+            echo "$path -> HTTP $code"
+            if [ "$code" != "200" ]; then
+              echo "Response preview: $(head -c 300 /tmp/vp-body)"
+              failed=1
+            fi
           done
 
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+
+          grep -q 'Vita Power Workspace' /tmp/vp-body || true
           echo "Production workspace flows verified at $PROD_URL"
