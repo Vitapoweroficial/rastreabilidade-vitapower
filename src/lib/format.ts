@@ -12,7 +12,10 @@ export function formatDate(value: string | null | undefined) {
     return "-";
   }
 
-  const date = new Date(`${value}T00:00:00Z`);
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00Z` : value;
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return "-";
+
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -26,13 +29,18 @@ export function formatDateTime(value: string | null | undefined) {
     return "-";
   }
 
+  const normalized = value.includes("T") ? value : value.replace(" ", "T");
+  const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized);
+  const date = new Date(hasTimezone ? normalized : `${normalized}Z`);
+  if (Number.isNaN(date.getTime())) return "-";
+
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit"
-  }).format(new Date(`${value.replace(" ", "T")}Z`));
+  }).format(date);
 }
 
 export function formatQuantity(quantity: number, unit: string) {
