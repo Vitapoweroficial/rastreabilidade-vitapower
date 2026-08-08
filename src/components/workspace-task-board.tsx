@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { CheckCircle2, ChevronRight, Clock3, Filter, Save, Search, UserRound, UsersRound } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import type { WorkspaceAlertView } from "@/components/workspace-alert-center";
@@ -43,10 +44,13 @@ function isOverdue(task: WorkspaceAlertView) {
 }
 
 export function WorkspaceTaskBoard({ initialTasks, members }: { initialTasks: WorkspaceAlertView[]; members: WorkspaceMember[] }) {
+  const searchParams = useSearchParams();
+  const requestedMember = searchParams.get("responsavel");
+  const initialMemberFilter = requestedMember && members.some((member) => String(member.id) === requestedMember) ? requestedMember : "todos";
   const [tasks, setTasks] = useState(initialTasks);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"abertas" | "todas" | TaskStatus>("abertas");
-  const [memberFilter, setMemberFilter] = useState<"todos" | "sem_responsavel" | string>("todos");
+  const [memberFilter, setMemberFilter] = useState<"todos" | "sem_responsavel" | string>(initialMemberFilter);
   const [savingId, setSavingId] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
