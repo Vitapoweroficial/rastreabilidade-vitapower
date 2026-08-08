@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureSchema, getSql } from "@/lib/db";
-import { getDashboardStats, listLots } from "@/lib/repository";
+import { getDashboardStats } from "@/lib/repository";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,22 +64,6 @@ async function runSmokeTest(request: NextRequest) {
 export async function GET(request: NextRequest) {
   if (request.nextUrl.searchParams.has("mode")) {
     return runSmokeTest(request);
-  }
-
-  if (request.nextUrl.searchParams.get("scope") === "lots") {
-    try {
-      const lots = await listLots(6);
-      return NextResponse.json({ ok: true, lotsReadable: true, count: lots.length });
-    } catch (error) {
-      return NextResponse.json(
-        {
-          ok: false,
-          lotsReadable: false,
-          error: error instanceof Error ? error.message : "unknown_lots_error"
-        },
-        { status: 500 }
-      );
-    }
   }
 
   return NextResponse.json({
