@@ -37,3 +37,24 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify production Workspace URL
+        shell: bash
+        run: |
+          set -euo pipefail
+          candidates=(
+            "https://rastreabilidade-vitapower.vercel.app"
+            "https://rastreabilidade-vitapower-vitapoweroficials-projects.vercel.app"
+            "https://rastreabilidade-vitapower-git-main-vitapoweroficials-projects.vercel.app"
+          )
+          for url in "${candidates[@]}"; do
+            echo "Checking $url"
+            response="$(curl --connect-timeout 10 --max-time 20 -fsSL "$url/api/health" 2>/dev/null || true)"
+            if printf '%s' "$response" | grep -q '"ok":true'; then
+              echo "VALIDATED_PRODUCTION_URL=$url"
+              echo "HEALTH_RESPONSE=$response"
+              exit 0
+            fi
+          done
+          echo "No candidate production URL returned a healthy Workspace response." >&2
+          exit 1
