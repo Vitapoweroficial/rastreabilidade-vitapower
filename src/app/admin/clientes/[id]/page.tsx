@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
-import { ArrowLeft, Boxes, ClipboardList, FileText, FlaskConical, Mail, PackageCheck, Phone, Tags } from "lucide-react";
+import { ArrowLeft, Boxes, ClipboardList, FileInput, FileText, FlaskConical, Mail, PackageCheck, Phone, Tags } from "lucide-react";
+import { privateLabelSteps } from "@/components/private-label/questionnaire-data";
 import { formatDateTime } from "@/lib/format";
+import { listPrivateLabelBriefingsForClient } from "@/lib/private-label-briefings";
 import { getClientDNA } from "@/lib/private-label-repository";
 import { privateLabelStageProgress } from "@/lib/private-label-config";
 
@@ -13,6 +15,12 @@ function money(value: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 }
 
+function briefingValue(value: string | boolean | undefined) {
+  if (typeof value === "boolean") return value ? "Sim" : "Não";
+  const normalized = String(value ?? "").trim();
+  return normalized || "—";
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function ClientDNAPage({ params }: PageProps) {
@@ -20,11 +28,15 @@ export default async function ClientDNAPage({ params }: PageProps) {
   const clientId = Number(id);
   if (!Number.isFinite(clientId)) notFound();
 
-  const dna = await getClientDNA(clientId);
+  const [dna, briefings] = await Promise.all([
+    getClientDNA(clientId),
+    listPrivateLabelBriefingsForClient(clientId)
+  ]);
   if (!dna) notFound();
 
   const { client, products, projects, formulas, proposals, lots } = dna;
   const metrics: MetricCard[] = [
+    { label: "Briefings", value: briefings.length, icon: FileInput },
     { label: "Produtos", value: products.length, icon: Boxes },
     { label: "Projetos", value: projects.length, icon: ClipboardList },
     { label: "Fórmulas", value: formulas.length, icon: FlaskConical },
@@ -60,13 +72,42 @@ export default async function ClientDNAPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
         {metrics.map(({ label, value, icon: Icon }) => (
           <div key={label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between"><div className="grid h-10 w-10 place-items-center rounded-xl bg-slate-950 text-white"><Icon size={18} /></div><span className="text-2xl font-black">{value}</span></div>
             <p className="mt-3 text-sm font-bold text-slate-600">{label}</p>
           </div>
         ))}
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div><p className="text-xs font-black uppercase tracking-[0.18em] text-red-700">Entrada do cliente</p><h2 className="mt-1 text-2xl font-black">Briefings recebidos</h2><p className="mt-1 text-sm text-slate-500">Respostas originais enviadas pelo cliente, preservadas no histórico.</p></div>
+          <Link href="/private-label/briefing" className="btn-secondary">Abrir formulário público</Link>
+        </div>
+        <div className="mt-5 space-y-3">
+          {briefings.length === 0 ? <Empty text="Nenhum briefing enviado pelo formulário integrado." /> : briefings.map((briefing) => (
+            <details key={briefing.id} className="group rounded-2xl border border-slate-200 bg-slate-50 p-4 open:bg-white">
+              <summary className="cursor-pointer list-none">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div><div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">Recebido</span><span className="text-xs font-bold text-slate-400">VP-PL-{String(briefing.id).padStart(5, "0")}</span></div><p className="mt-2 text-lg font-black text-slate-950">{briefingValue(briefing.answers.projectName)} · {briefingValue(briefing.answers.productName)}</p><p className="mt-1 text-xs text-slate-500">Enviado em {formatDateTime(briefing.submittedAt)}</p></div>
+                  <span className="text-sm font-black text-red-700">Ver briefing completo</span>
+                </div>
+              </summary>
+              <div className="mt-5 space-y-3 border-t border-slate-200 pt-5">
+                {privateLabelSteps.filter((section) => section.questions.length > 0).map((section) => (
+                  <div key={section.id} className="rounded-xl border border-slate-100 bg-white p-4">
+                    <h3 className="font-black text-slate-950">{section.eyebrow}. {section.title}</h3>
+                    <dl className="mt-3 grid gap-3 md:grid-cols-2">
+                      {section.questions.map((question) => <div key={question.id}><dt className="text-[11px] font-black uppercase tracking-wide text-slate-400">{question.label}</dt><dd className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{briefingValue(briefing.answers[question.id])}</dd></div>)}
+                    </dl>
+                  </div>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
