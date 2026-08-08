@@ -67,6 +67,11 @@ jobs:
             exit 1
           fi
 
+          echo "Healthy production alias: $PROD_URL"
+          lots_health="$(curl --silent --show-error --location "$PROD_URL/api/health?scope=lots" || true)"
+          echo "Lot health: $lots_health"
+          echo "$lots_health" | grep -q '"ok":true'
+
           dashboard="$(curl --fail --silent --show-error --location --retry 6 --retry-delay 5 --retry-all-errors "$PROD_URL/admin")"
           echo "$dashboard" | grep -q 'Vita Power Workspace'
 
