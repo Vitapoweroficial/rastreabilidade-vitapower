@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, ChevronRight, Clock3, Filter, Save, Search, UserRound } from "lucide-react";
+import { CheckCircle2, ChevronRight, Clock3, Filter, Save, Search, UserRound, UsersRound } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import type { WorkspaceAlertView } from "@/components/workspace-alert-center";
+import type { WorkspaceMember } from "@/lib/workspace-members";
 
 type TaskStatus = "novo" | "em_andamento" | "aguardando_cliente" | "concluido";
 
@@ -41,32 +42,41 @@ function isOverdue(task: WorkspaceAlertView) {
   return Boolean(task.dueAt && task.taskStatus !== "concluido" && new Date(task.dueAt).getTime() < Date.now());
 }
 
-export function WorkspaceTaskBoard({ initialTasks }: { initialTasks: WorkspaceAlertView[] }) {
+export function WorkspaceTaskBoard({ initialTasks, members }: { initialTasks: WorkspaceAlertView[]; members: WorkspaceMember[] }) {
   const [tasks, setTasks] = useState(initialTasks);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"abertas" | "todas" | TaskStatus>("abertas");
+  const [memberFilter, setMemberFilter] = useState<"todos" | "sem_responsavel" | string>("todos");
   const [savingId, setSavingId] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const activeMembers = useMemo(() => members.filter((member) => member.active), [members]);
 
   const filtered = useMemo(() => {
     const term = normalize(query.trim());
     return tasks.filter((task) => {
       const matchesStatus = statusFilter === "todas" || (statusFilter === "abertas" ? task.taskStatus !== "concluido" : task.taskStatus === statusFilter);
+      const matchesMember = memberFilter === "todos" || (memberFilter === "sem_responsavel" ? !task.assigneeMemberId : String(task.assigneeMemberId) === memberFilter);
       const haystack = normalize(`${task.title} ${task.message} ${task.audience} ${task.assignee ?? ""}`);
-      return matchesStatus && (!term || haystack.includes(term));
+      return matchesStatus && matchesMember && (!term || haystack.includes(term));
     });
-  }, [query, statusFilter, tasks]);
+  }, [memberFilter, query, statusFilter, tasks]);
 
   const counters = useMemo(() => ({
     abertas: tasks.filter((task) => task.taskStatus !== "concluido").length,
     vencidas: tasks.filter(isOverdue).length,
     andamento: tasks.filter((task) => task.taskStatus === "em_andamento").length,
-    concluidas: tasks.filter((task) => task.taskStatus === "concluido").length
+    semDono: tasks.filter((task) => task.taskStatus !== "concluido" && !task.assigneeMemberId).length
   }), [tasks]);
 
   function patchLocal(id: number, patch: Partial<WorkspaceAlertView>) {
     setTasks((items) => items.map((task) => task.id === id ? { ...task, ...patch } : task));
+  }
+
+  function assignMember(taskId: number, memberId: number | null) {
+    const member = memberId ? activeMembers.find((item) => item.id === memberId) : null;
+    patchLocal(taskId, { assigneeMemberId: member?.id ?? null, assignee: member?.name ?? null });
   }
 
   async function saveTask(task: WorkspaceAlertView) {
@@ -80,7 +90,7 @@ export function WorkspaceTaskBoard({ initialTasks }: { initialTasks: WorkspaceAl
           alertId: task.id,
           action: "task",
           taskStatus: task.taskStatus,
-          assignee: task.assignee,
+          assigneeMemberId: task.assigneeMemberId,
           dueAt: task.dueAt
         })
       });
@@ -111,30 +121,41 @@ export function WorkspaceTaskBoard({ initialTasks }: { initialTasks: WorkspaceAl
   return (
     <div className="space-y-6 pb-8">
       <section className="overflow-hidden rounded-[28px] border border-slate-800 bg-slate-950 p-6 text-white shadow-[0_28px_80px_rgba(15,23,42,0.24)] sm:p-8">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-red-200">Execução Private Label</p>
-        <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Nenhum briefing sem dono.</h1>
-        <p className="mt-3 max-w-3xl text-slate-300">Cada novo briefing vira uma tarefa com responsável, prazo e status. O objetivo é deixar claro quem assumiu, o que está parado e o que precisa acontecer agora.</p>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-red-200">Execução Private Label</p>
+            <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Nenhum briefing sem dono.</h1>
+            <p className="mt-3 max-w-3xl text-slate-300">Cada briefing vira uma tarefa ligada a um colaborador cadastrado, com prazo, status e visão individual da carga de trabalho.</p>
+          </div>
+          <Link href="/admin/equipe" className="btn-secondary border-white/15 bg-white/10 text-white hover:bg-white/20"><UsersRound size={16} /> Gerenciar equipe</Link>
+        </div>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Metric label="Tarefas abertas" value={counters.abertas} icon={Filter} />
         <Metric label="Vencidas" value={counters.vencidas} icon={Clock3} danger={counters.vencidas > 0} />
         <Metric label="Em andamento" value={counters.andamento} icon={UserRound} />
-        <Metric label="Concluídas" value={counters.concluidas} icon={CheckCircle2} />
+        <Metric label="Sem responsável" value={counters.semDono} icon={UsersRound} danger={counters.semDono > 0} />
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="relative flex-1">
+        <div className="grid gap-3 xl:grid-cols-[1fr_auto_auto] xl:items-center">
+          <div className="relative">
             <Search size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar cliente, projeto, produto ou responsável..." className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm font-semibold outline-none focus:border-red-300 focus:bg-white focus:ring-4 focus:ring-red-100" />
           </div>
+          <select value={memberFilter} onChange={(event) => setMemberFilter(event.target.value)} className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-black text-slate-700 outline-none focus:border-red-300 focus:ring-4 focus:ring-red-100">
+            <option value="todos">Toda a equipe</option>
+            <option value="sem_responsavel">Sem responsável</option>
+            {activeMembers.map((member) => <option key={member.id} value={String(member.id)}>{member.name} · {member.department}</option>)}
+          </select>
           <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)} className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm font-black text-slate-700 outline-none focus:border-red-300 focus:ring-4 focus:ring-red-100">
             <option value="abertas">Abertas</option>
             <option value="todas">Todas</option>
             {statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
           </select>
         </div>
+        {memberFilter !== "todos" ? <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2 text-xs font-bold text-slate-600">Visão individual ativa: {memberFilter === "sem_responsavel" ? "tarefas sem responsável" : activeMembers.find((member) => String(member.id) === memberFilter)?.name ?? "colaborador"}.</div> : null}
         {message ? <p className="mt-3 text-sm font-bold text-slate-600">{message}</p> : null}
       </section>
 
@@ -161,7 +182,7 @@ export function WorkspaceTaskBoard({ initialTasks }: { initialTasks: WorkspaceAl
               </div>
 
               <div className="mt-5 grid gap-4 border-t border-slate-100 pt-5 md:grid-cols-3">
-                <label className="space-y-1.5"><span className="text-xs font-black uppercase tracking-wide text-slate-500">Responsável</span><input value={task.assignee ?? ""} onChange={(event) => patchLocal(task.id, { assignee: event.target.value })} placeholder="Ex.: Gabriel" className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm font-semibold outline-none focus:border-red-300 focus:ring-4 focus:ring-red-100" /></label>
+                <label className="space-y-1.5"><span className="text-xs font-black uppercase tracking-wide text-slate-500">Responsável</span><select value={task.assigneeMemberId ? String(task.assigneeMemberId) : ""} onChange={(event) => assignMember(task.id, event.target.value ? Number(event.target.value) : null)} className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-red-300 focus:ring-4 focus:ring-red-100"><option value="">Sem responsável</option>{activeMembers.map((member) => <option key={member.id} value={member.id}>{member.name} · {member.department}</option>)}</select></label>
                 <label className="space-y-1.5"><span className="text-xs font-black uppercase tracking-wide text-slate-500">Prazo</span><input type="datetime-local" value={dateInputValue(task.dueAt)} onChange={(event) => patchLocal(task.id, { dueAt: event.target.value ? new Date(event.target.value).toISOString() : null })} className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm font-semibold outline-none focus:border-red-300 focus:ring-4 focus:ring-red-100" /></label>
                 <label className="space-y-1.5"><span className="text-xs font-black uppercase tracking-wide text-slate-500">Status</span><select value={task.taskStatus} onChange={(event) => patchLocal(task.id, { taskStatus: event.target.value as TaskStatus })} className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-red-300 focus:ring-4 focus:ring-red-100">{statusOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
               </div>
