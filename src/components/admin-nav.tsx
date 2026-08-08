@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Beaker, Boxes, ClipboardList, PackageCheck, UsersRound } from "lucide-react";
+import { BarChart3, Beaker, Boxes, ClipboardCheck, ClipboardList, PackageCheck, UsersRound } from "lucide-react";
 
 const items = [
   { href: "/admin", label: "Dashboard", icon: BarChart3 },
+  { href: "/admin/tarefas", label: "Tarefas", icon: ClipboardCheck },
   { href: "/admin/clientes", label: "Clientes", icon: UsersRound },
   { href: "/admin/produtos", label: "Produtos", icon: Boxes },
   { href: "/admin/engenharia", label: "Engenharia", icon: Beaker },
