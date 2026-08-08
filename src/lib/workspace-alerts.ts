@@ -206,11 +206,11 @@ export async function updateWorkspaceTask(input: {
 
   await sql.query(
     `UPDATE workspace_alerts SET
-       task_status = $2,
-       assignee = $3,
+       task_status = $2::text,
+       assignee = $3::text,
        due_at = $4::timestamptz,
-       accepted_at = CASE WHEN $3 IS NOT NULL THEN COALESCE(accepted_at, NOW()) ELSE accepted_at END,
-       completed_at = CASE WHEN $2 = 'concluido' THEN COALESCE(completed_at, NOW()) ELSE NULL END,
+       accepted_at = CASE WHEN $3::text IS NOT NULL THEN COALESCE(accepted_at, NOW()) ELSE accepted_at END,
+       completed_at = CASE WHEN $2::text = 'concluido' THEN COALESCE(completed_at, NOW()) ELSE NULL END,
        read_at = COALESCE(read_at, NOW()),
        updated_at = NOW()
      WHERE id = $1`,
