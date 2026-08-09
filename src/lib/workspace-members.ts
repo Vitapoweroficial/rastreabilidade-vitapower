@@ -59,7 +59,7 @@ function parsePermissions(value: MemberRow["permissions"]): WorkspaceModuleId[] 
 
 function mapMember(row: MemberRow): WorkspaceMember {
   return {
-    id: row.id,
+    id: Number(row.id),
     name: row.name,
     email: row.email,
     department: row.department,
@@ -93,27 +93,34 @@ export async function ensureWorkspaceMemberSchema() {
       `);
       await Promise.all([
         sql.query("CREATE INDEX IF NOT EXISTS idx_workspace_members_active ON workspace_members(active)"),
-        sql.query("CREATE INDEX IF NOT EXISTS idx_workspace_members_department ON workspace_members(department)")
+        sql.query("CREATE INDEX IF NOT EXISTS idx_workspace_members_department ON workspace_members(department)"),
+        sql.query("CREATE UNIQUE INDEX IF NOT EXISTS idx_workspace_members_email_lower ON workspace_members(LOWER(email)) WHERE email IS NOT NULL")
       ]);
 
       const seedMembers = [
-        ["Andrew", "Direção", "CEO / Liderança geral", "admin", ["dashboard","tarefas","clientes","produtos","engenharia","private_label","lotes","equipe"]],
-        ["Vitória", "Marketing e Projetos", "Gestão de projetos", "gestor", ["dashboard","tarefas","clientes","produtos","private_label"]],
-        ["Harlem", "Marketplace", "Head de Marketplace", "gestor", ["dashboard","tarefas","clientes","produtos"]],
-        ["Maria", "Operações", "Operacional", "membro", ["dashboard","tarefas","produtos","lotes"]],
-        ["Gabriel", "Comercial", "Vendas", "gestor", ["dashboard","tarefas","clientes","private_label"]],
-        ["Letícia", "CRM e Inside Sales", "CRM / Inside Sales", "membro", ["dashboard","tarefas","clientes","private_label"]],
-        ["Bruno", "CRM e Inside Sales", "CRM / Inside Sales", "membro", ["dashboard","tarefas","clientes","private_label"]]
+        ["Andrew", "andrew@vitapowernutrition.com.br", "Direção", "CEO / Liderança geral", "admin", ["dashboard","tarefas","clientes","produtos","engenharia","private_label","lotes","equipe"]],
+        ["Vitória", null, "Marketing e Projetos", "Gestão de projetos", "gestor", ["dashboard","tarefas","clientes","produtos","private_label"]],
+        ["Harlem", null, "Marketplace", "Head de Marketplace", "gestor", ["dashboard","tarefas","clientes","produtos"]],
+        ["Maria", null, "Operações", "Operacional", "membro", ["dashboard","tarefas","produtos","lotes"]],
+        ["Gabriel", null, "Comercial", "Vendas", "gestor", ["dashboard","tarefas","clientes","private_label"]],
+        ["Letícia", null, "CRM e Inside Sales", "CRM / Inside Sales", "membro", ["dashboard","tarefas","clientes","private_label"]],
+        ["Bruno", null, "CRM e Inside Sales", "CRM / Inside Sales", "membro", ["dashboard","tarefas","clientes","private_label"]]
       ] as const;
 
-      for (const [name, department, role, accessLevel, permissions] of seedMembers) {
+      for (const [name, email, department, role, accessLevel, permissions] of seedMembers) {
         await sql.query(
-          `INSERT INTO workspace_members (name, department, role, access_level, permissions)
-           SELECT $1, $2, $3, $4, $5::jsonb
+          `INSERT INTO workspace_members (name, email, department, role, access_level, permissions)
+           SELECT $1, $2, $3, $4, $5, $6::jsonb
            WHERE NOT EXISTS (SELECT 1 FROM workspace_members WHERE LOWER(name) = LOWER($1))`,
-          [name, department, role, accessLevel, JSON.stringify(permissions)]
+          [name, email, department, role, accessLevel, JSON.stringify(permissions)]
         );
       }
+
+      await sql.query(`
+        UPDATE workspace_members
+        SET email = 'andrew@vitapowernutrition.com.br', updated_at = NOW()
+        WHERE LOWER(name) = 'andrew' AND (email IS NULL OR TRIM(email) = '')
+      `);
     })().catch((error) => {
       schemaPromise = null;
       throw error;
