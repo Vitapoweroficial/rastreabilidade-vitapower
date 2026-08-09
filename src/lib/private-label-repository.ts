@@ -1,4 +1,5 @@
 import { ensureSchema, getSql } from "@/lib/db";
+import { ensurePrivateLabelEnterpriseSchema } from "@/lib/private-label-enterprise";
 import { getPrivateLabelStage } from "@/lib/private-label-config";
 
 type Numeric = number | string;
@@ -21,6 +22,7 @@ type ProjectRow = {
 
 async function query<T>(statement: string, params: unknown[] = []): Promise<T[]> {
   await ensureSchema();
+  await ensurePrivateLabelEnterpriseSchema();
   return (await getSql().query(statement, params)) as unknown as T[];
 }
 
@@ -52,7 +54,7 @@ export async function listPrivateLabelProjects() {
   const rows = await query<ProjectRow>(`
     SELECT p.id, p.client_id, c.brand_name AS client_brand_name, p.product_id,
       products.name AS product_name, p.name, p.status, p.briefing, p.created_at,
-      (SELECT COUNT(*)::int FROM engineering_formulas f WHERE f.client_id = p.client_id AND (p.product_id IS NULL OR f.product_id = p.product_id)) AS formula_count,
+      (SELECT COUNT(*)::int FROM engineering_formulas f WHERE f.project_id = p.id) AS formula_count,
       (SELECT COUNT(*)::int FROM pricing_requests pr WHERE pr.project_id = p.id) AS pricing_count,
       (SELECT COUNT(*)::int FROM commercial_proposals cp
         INNER JOIN pricing_requests pr2 ON pr2.id = cp.pricing_request_id
@@ -116,7 +118,7 @@ export async function getClientDNA(clientId: number) {
     query<ProjectRow>(`
       SELECT p.id, p.client_id, c.brand_name AS client_brand_name, p.product_id,
         products.name AS product_name, p.name, p.status, p.briefing, p.created_at,
-        (SELECT COUNT(*)::int FROM engineering_formulas f WHERE f.client_id = p.client_id AND (p.product_id IS NULL OR f.product_id = p.product_id)) AS formula_count,
+        (SELECT COUNT(*)::int FROM engineering_formulas f WHERE f.project_id = p.id) AS formula_count,
         (SELECT COUNT(*)::int FROM pricing_requests pr WHERE pr.project_id = p.id) AS pricing_count,
         (SELECT COUNT(*)::int FROM commercial_proposals cp INNER JOIN pricing_requests pr2 ON pr2.id = cp.pricing_request_id WHERE pr2.project_id = p.id) AS proposal_count,
         (SELECT COUNT(*)::int FROM lots l INNER JOIN products lp ON lp.id = l.product_id WHERE lp.client_id = p.client_id AND (p.product_id IS NULL OR lp.id = p.product_id)) AS lot_count
@@ -124,12 +126,12 @@ export async function getClientDNA(clientId: number) {
       INNER JOIN clients c ON c.id = p.client_id
       LEFT JOIN products ON products.id = p.product_id
       WHERE p.client_id = $1 ORDER BY p.created_at DESC`, [clientId]),
-    query<{ id: number; name: string; code: string; version: string; status: string; total_cost: Numeric }>(`
-      SELECT f.id, f.name, f.code, f.version, f.status,
+    query<{ id: number; name: string; code: string; version: string; status: string; total_cost: Numeric; project_id: number | null }>(`
+      SELECT f.id, f.name, f.code, f.version, f.status, f.project_id,
         COALESCE((SELECT SUM(fi.cost) FROM formula_items fi WHERE fi.formula_id = f.id), 0)::float8 AS total_cost
       FROM engineering_formulas f WHERE f.client_id = $1 ORDER BY f.created_at DESC`, [clientId]),
-    query<{ id: number; title: string; customer_mode: string; pdf_status: string; send_status: string }>(`
-      SELECT id, title, customer_mode, pdf_status, send_status
+    query<{ id: number; title: string; customer_mode: string; pdf_status: string; send_status: string; total_price: Numeric }>(`
+      SELECT id, title, customer_mode, pdf_status, send_status, total_price::float8 AS total_price
       FROM commercial_proposals WHERE client_id = $1 ORDER BY created_at DESC`, [clientId]),
     query<{ id: number; code: string; product_name: string; status: string; expiration_date: string }>(`
       SELECT l.id, l.code, p.name AS product_name, l.status, l.expiration_date::text AS expiration_date
@@ -152,7 +154,7 @@ export async function getClientDNA(clientId: number) {
     products,
     projects: projects.map(mapProject),
     formulas: formulas.map((item) => ({ ...item, total_cost: Number(item.total_cost || 0) })),
-    proposals,
+    proposals: proposals.map((item) => ({ ...item, total_price: Number(item.total_price || 0) })),
     lots
   };
 }
