@@ -2,12 +2,10 @@
   "name": "rastreabilidade-vitapower",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": ">=20"
-  },
+  "engines": { "node": ">=20" },
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/verify-neon-persistence.mjs && next build",
+    "build": "node scripts/verify-neon-persistence.mjs && node scripts/verify-vita-os-enterprise.mjs && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -32,7 +30,5 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
-  "overrides": {
-    "postcss": "$postcss"
-  }
+  "overrides": { "postcss": "$postcss" }
 }
