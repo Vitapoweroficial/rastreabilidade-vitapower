@@ -99,12 +99,7 @@ export async function ensureWorkspaceMemberSchema() {
 
       const seedMembers = [
         ["Andrew", "andrew@vitapowernutrition.com.br", "Direção", "CEO / Liderança geral", "admin", ["dashboard","tarefas","clientes","produtos","engenharia","private_label","lotes","equipe"]],
-        ["Vitória", null, "Marketing e Projetos", "Gestão de projetos", "gestor", ["dashboard","tarefas","clientes","produtos","private_label"]],
-        ["Harlem", null, "Marketplace", "Head de Marketplace", "gestor", ["dashboard","tarefas","clientes","produtos"]],
-        ["Maria", null, "Operações", "Operacional", "membro", ["dashboard","tarefas","produtos","lotes"]],
-        ["Gabriel", null, "Comercial", "Vendas", "gestor", ["dashboard","tarefas","clientes","private_label"]],
-        ["Letícia", null, "CRM e Inside Sales", "CRM / Inside Sales", "membro", ["dashboard","tarefas","clientes","private_label"]],
-        ["Bruno", null, "CRM e Inside Sales", "CRM / Inside Sales", "membro", ["dashboard","tarefas","clientes","private_label"]]
+        ["Vitória", null, "Marketing e Projetos", "Gestão de projetos", "gestor", ["dashboard","tarefas","clientes","produtos","private_label"]]
       ] as const;
 
       for (const [name, email, department, role, accessLevel, permissions] of seedMembers) {
