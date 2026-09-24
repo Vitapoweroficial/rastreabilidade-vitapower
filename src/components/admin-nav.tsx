@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Beaker, Boxes, ClipboardCheck, ClipboardList, PackageCheck, UsersRound, UserRoundCog } from "lucide-react";
+import { BarChart3, Beaker, Boxes, ClipboardCheck, ClipboardList, PackageCheck, ShoppingCart, UsersRound, UserRoundCog } from "lucide-react";
 import type { WorkspaceModuleId } from "@/lib/workspace-members";
 
 const items: Array<{ href: string; label: string; icon: typeof BarChart3; module: WorkspaceModuleId }> = [
@@ -12,6 +12,7 @@ const items: Array<{ href: string; label: string; icon: typeof BarChart3; module
   { href: "/admin/clientes", label: "Clientes", icon: UsersRound, module: "clientes" },
   { href: "/admin/produtos", label: "Produtos", icon: Boxes, module: "produtos" },
   { href: "/admin/engenharia", label: "Engenharia", icon: Beaker, module: "engenharia" },
+  { href: "/admin/compras", label: "Cotações & Compras", icon: ShoppingCart, module: "compras" },
   { href: "/admin/modulos/private-label", label: "Private Label", icon: ClipboardList, module: "private_label" },
   { href: "/admin/lotes", label: "Lotes", icon: PackageCheck, module: "lotes" }
 ];

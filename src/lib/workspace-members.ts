@@ -6,6 +6,7 @@ export const workspaceModules = [
   { id: "clientes", label: "Clientes" },
   { id: "produtos", label: "Produtos" },
   { id: "engenharia", label: "Engenharia" },
+  { id: "compras", label: "Cotações & Compras" },
   { id: "private_label", label: "Private Label" },
   { id: "lotes", label: "Lotes" },
   { id: "equipe", label: "Equipe" }
@@ -98,7 +99,7 @@ export async function ensureWorkspaceMemberSchema() {
       ]);
 
       const seedMembers = [
-        ["Andrew", "andrew@vitapowernutrition.com.br", "Direção", "CEO / Liderança geral", "admin", ["dashboard","tarefas","clientes","produtos","engenharia","private_label","lotes","equipe"]],
+        ["Andrew", "andrew@vitapowernutrition.com.br", "Direção", "CEO / Liderança geral", "admin", ["dashboard","tarefas","clientes","produtos","engenharia","compras","private_label","lotes","equipe"]],
         ["Vitória", null, "Marketing e Projetos", "Gestão de projetos", "gestor", ["dashboard","tarefas","clientes","produtos","private_label"]]
       ] as const;
 
