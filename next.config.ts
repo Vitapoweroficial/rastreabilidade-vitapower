@@ -5,6 +5,14 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "6mb"
     }
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/adiv",
+        destination: "/adiv.html"
+      }
+    ];
   }
 };
 
