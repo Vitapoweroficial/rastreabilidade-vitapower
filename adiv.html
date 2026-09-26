@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#11100f">
+  <meta name="description" content="ADIV — origem, significado, arquitetura da marca e domínios em análise.">
+  <title>ADIV — A vida vista de outra forma</title>
+  <style>
+    :root{
+      --bg:#f4f0e9;--paper:#fbf8f3;--ink:#171512;--muted:#6f685f;--line:#d9d1c6;
+      --accent:#a2184b;--accent-soft:#f4dde6;--dark:#11100f;--green:#176a4c;--amber:#996515;
+      --shadow:0 18px 50px rgba(32,25,18,.08);--radius:24px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(1120px,calc(100% - 28px));margin:0 auto}
+    .top{padding:18px 0 10px;position:sticky;top:0;z-index:30;background:rgba(244,240,233,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(217,209,198,.75)}
+    .topin{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brandmini{font-weight:900;letter-spacing:-.04em;font-size:22px}
+    .brandmini span{color:var(--accent)}
+    .nav{display:flex;gap:6px;overflow:auto;scrollbar-width:none}
+    .nav a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:700;padding:9px 12px;border-radius:999px;white-space:nowrap}
+    .nav a:hover{background:var(--paper);color:var(--ink)}
+    main{padding:30px 0 70px}
+    .hero{background:var(--dark);color:white;border-radius:32px;padding:clamp(26px,6vw,62px);overflow:hidden;position:relative;box-shadow:var(--shadow)}
+    .hero:after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;right:-180px;top:-180px;background:radial-gradient(circle,rgba(162,24,75,.55),rgba(162,24,75,0) 70%)}
+    .eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:800;opacity:.66}
+    .heroWord{font-size:clamp(72px,20vw,170px);line-height:.84;letter-spacing:-.075em;font-weight:950;margin:26px 0 16px;position:relative;z-index:2}
+    .heroWord .v{color:#df5d8c}
+    .tagline{font-family:Georgia,serif;font-style:italic;font-size:clamp(22px,4.8vw,42px);line-height:1.12;max-width:760px;margin:0}
+    .heroActions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;position:relative;z-index:3}
+    .btn{min-height:46px;border-radius:14px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:0 16px;font-weight:800}
+    .btn.dark{background:white;border-color:white;color:#111}
+    .btn.ghost{background:transparent;border-color:rgba(255,255,255,.25);color:white}
+    .btn.accent{background:var(--accent);border-color:var(--accent);color:white}
+    .section{margin-top:26px}
+    .sectionHead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:13px}
+    h2{margin:0;font-size:clamp(25px,4.5vw,40px);letter-spacing:-.04em}
+    .sub{color:var(--muted);font-size:14px;line-height:1.55;margin:7px 0 0}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 8px 28px rgba(32,25,18,.035)}
+    .lifeFlip{min-height:330px;display:flex;flex-direction:column;justify-content:space-between}
+    .flipStage{display:flex;align-items:center;justify-content:center;min-height:170px}
+    .flipText{font-weight:950;font-size:clamp(68px,14vw,120px);letter-spacing:-.07em;transition:.28s ease}
+    .flipText small{font-size:.18em;letter-spacing:.05em;display:block;text-align:center;color:var(--muted);margin-top:12px}
+    .letters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .letter{border:1px solid var(--line);background:white;border-radius:16px;min-height:84px;font-weight:950;font-size:28px;transition:.2s}
+    .letter.active{background:var(--accent-soft);border-color:#d890ab;color:var(--accent)}
+    .letterDetail{margin-top:12px;background:#fff;border-radius:16px;padding:16px;min-height:106px}
+    .letterDetail strong{font-size:18px}
+    .quote{font-family:Georgia,serif;font-size:clamp(23px,3.3vw,34px);line-height:1.25;margin:8px 0 14px}
+    .quoteCard{background:#efe9e0;border-left:5px solid var(--accent);border-radius:4px 18px 18px 4px;padding:20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}
+    .pill.ok{color:var(--green);border-color:#b9d9cd;background:#eef8f4}
+    .pill.no{color:#8a2e2e;border-color:#e2bcbc;background:#fbefef}
+    .pill.warn{color:var(--amber);border-color:#e4d1a9;background:#fff7e5}
+    .layers{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .layer{padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--paper)}
+    .layer b{display:block;margin-bottom:5px}
+    .layer span{color:var(--muted);font-size:13px;line-height:1.45}
+    .strategy{background:#191715;color:#fff}
+    .strategy .sub{color:#bcb4aa}
+    .stack{display:grid;gap:9px;margin-top:18px}
+    .stackItem{border:1px solid #39342e;border-radius:16px;padding:15px;background:#201d1a}
+    .stackItem small{display:block;color:#aaa096;text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:800}
+    .stackItem strong{display:block;margin-top:5px;font-size:18px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .input,.select{min-height:46px;border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:0 13px;color:var(--ink);font-size:16px}
+    .input{flex:1;min-width:200px}
+    .select{min-width:170px}
+    .candidates{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .candidate{border:1px solid var(--line);background:var(--paper);border-radius:20px;padding:17px;position:relative}
+    .candidate.isFav{border-color:#d890ab;background:#fff8fb}
+    .candTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .candName{font-weight:950;font-size:19px;letter-spacing:-.025em}
+    .domain{font-size:13px;color:var(--muted);margin-top:4px;word-break:break-word}
+    .idea{margin-top:12px;font-size:14px;line-height:1.5}
+    .favBtn{width:44px;height:44px;border-radius:13px;border:1px solid var(--line);background:white;font-size:20px}
+    .favBtn.on{background:var(--accent);color:white;border-color:var(--accent)}
+    .stars{display:flex;gap:2px;margin-top:12px}
+    .star{border:0;background:transparent;font-size:24px;padding:3px;color:#c5bbb0}
+    .star.on{color:#bf8b17}
+    .domainTable{background:var(--paper);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+    .domainRow{display:grid;grid-template-columns:1.25fr .72fr 1fr;gap:12px;padding:14px 16px;border-top:1px solid var(--line);align-items:center}
+    .domainRow:first-child{border-top:0}
+    .domainName{font-weight:850;word-break:break-word}
+    .domainNote{font-size:13px;color:var(--muted)}
+    .status{text-align:left}
+    .review{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+    textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:16px;padding:14px;background:white;color:var(--ink);font-size:16px}
+    .summary{background:#111;color:white;border-radius:20px;padding:20px}
+    .summaryList{margin:14px 0 0;padding-left:20px;color:#dfd7ce;line-height:1.8}
+    .footer{padding:30px 0;color:var(--muted);font-size:12px;line-height:1.6;text-align:center}
+    .hidden{display:none!important}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111;color:#fff;border-radius:999px;padding:11px 15px;font-size:13px;font-weight:800;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+    .toast.show{opacity:1}
+    @media(max-width:760px){
+      .nav{display:none}.grid2,.review{grid-template-columns:1fr}.layers{grid-template-columns:1fr 1fr}.candidates{grid-template-columns:1fr}
+      .domainRow{grid-template-columns:1fr auto}.domainNote{grid-column:1/-1}.hero{border-radius:24px;padding:28px 22px}.card{padding:17px}.wrap{width:min(100% - 20px,1120px)}
+    }
+    @media(max-width:420px){.layers{grid-template-columns:1fr}.letters{gap:6px}.letter{min-height:68px}.heroActions .btn{flex:1}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap topin">
+      <div class="brandmini">AD<span>i</span>V</div>
+      <nav class="nav">
+        <a href="#origem">Origem</a><a href="#conceito">Conceito</a><a href="#nomes">Complementos</a><a href="#dominios">Domínios</a><a href="#avaliar">Avaliar</a>
+      </nav>
+      <button class="btn accent" id="shareTop">Compartilhar</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Projeto de marca · Andrew + Danillo</div>
+      <div class="heroWord">AD<span class="v">iV</span></div>
+      <p class="tagline">A vida vista de outra forma.</p>
+      <div class="heroActions">
+        <button class="btn dark" id="heroFlip">Descobrir a origem ↔</button>
+        <a class="btn ghost" href="#nomes" style="display:inline-flex;align-items:center;text-decoration:none">Ver complementos</a>
+      </div>
+    </section>
+
+    <section class="section" id="origem">
+      <div class="sectionHead"><div><h2>Um nome com mais de uma leitura.</h2><p class="sub">A proposta não nasce de uma palavra aleatória. Ela combina vida, fundadores, inovação e propósito.</p></div></div>
+      <div class="grid2">
+        <article class="card lifeFlip">
+          <div><div class="eyebrow" style="color:var(--muted);opacity:1">A inversão</div><p class="sub">Toque para enxergar a construção principal.</p></div>
+          <div class="flipStage"><div class="flipText" id="flipText">VIDA<small>toque para inverter</small></div></div>
+          <button class="btn" id="flipButton">VIDA ⇄ ADIV</button>
+        </article>
+        <article class="card">
+          <div class="eyebrow" style="color:var(--muted);opacity:1">As quatro letras</div>
+          <div class="letters" style="margin-top:12px">
+            <button class="letter active" data-letter="A">A</button><button class="letter" data-letter="D">D</button><button class="letter" data-letter="I">I</button><button class="letter" data-letter="V">V</button>
+          </div>
+          <div class="letterDetail" id="letterDetail"><strong>A — Andrew</strong><p class="sub">Sócio fundador. A primeira letra coloca a origem da sociedade dentro do próprio nome.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="conceito">
+      <div class="grid2">
+        <article class="card">
+          <div class="eyebrow" style="color:var(--muted);opacity:1">Inspiração</div>
+          <div class="quoteCard" style="margin-top:12px">
+            <p class="quote">“Mas o nobre projeta coisas nobres e na sua nobreza perseverará.”</p>
+            <div class="sub">Isaías 32:8</div>
+          </div>
+          <p class="sub" style="margin-top:15px">Na narrativa da marca, <strong style="color:var(--ink)">adiv</strong> é associado a gentil e cortês; Isaías 32:8 entra como inspiração conceitual de nobreza de intenção e firmeza. A palavra hebraica do versículo para “nobre” é <em>nadiv</em>, portanto a relação deve ser apresentada como inspiração — não como tradução literal.</p>
+        </article>
+        <article class="card strategy">
+          <div class="eyebrow">Arquitetura da marca</div>
+          <h2 style="margin-top:10px;color:white">Proteger o conjunto, não só ADIV.</h2>
+          <p class="sub">A estratégia é combinar ADIV com um complemento realmente distintivo e deixar o termo industrial como descritor.</p>
+          <div class="stack">
+            <div class="stackItem"><small>Marca</small><strong>ADIV + complemento distintivo</strong></div>
+            <div class="stackItem"><small>Descritor</small><strong>Indústria Nutracêutica</strong></div>
+            <div class="stackItem"><small>Manifesto</small><strong>A vida vista de outra forma.</strong></div>
+          </div>
+        </article>
+      </div>
+      <div class="layers" style="margin-top:14px">
+        <div class="layer"><b>Fundadores</b><span>A = Andrew · D = Danillo. A sociedade faz parte do próprio nome.</span></div>
+        <div class="layer"><b>Inovação</b><span>I = olhar para trás para aprender e construir algo novo e melhor.</span></div>
+        <div class="layer"><b>Vida</b><span>V = o centro: existir, crescer, renovar-se e enxergar sob outra perspectiva.</span></div>
+        <div class="layer"><b>Nobreza</b><span>Planos nobres, confiança, construção e prosperidade compartilhada.</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="nomes">
+      <div class="sectionHead">
+        <div><h2>Complementos em avaliação.</h2><p class="sub">Favorite e dê uma nota. Sua seleção fica salva neste aparelho.</p></div>
+        <span class="pill ok">✓ .com verificado</span>
+      </div>
+      <div class="candidates" id="candidateGrid"></div>
+    </section>
+
+    <section class="section" id="dominios">
+      <div class="sectionHead"><div><h2>Radar de domínios.</h2><p class="sub">Última verificação: Namecheap · 26/09/2026. Disponibilidade pode mudar.</p></div></div>
+      <div class="toolbar">
+        <input class="input" id="domainSearch" type="search" placeholder="Buscar domínio ou conceito…">
+        <select class="select" id="domainFilter"><option value="all">Todos</option><option value="available">Disponíveis</option><option value="unavailable">Indisponíveis</option><option value="strategic">Só estratégicos</option></select>
+      </div>
+      <div class="domainTable" id="domainTable"></div>
+      <p class="sub" style="margin-top:10px"><strong>Atenção:</strong> domínio disponível não significa marca disponível no INPI. A checagem jurídica precisa ser feita separadamente nas classes aplicáveis.</p>
+    </section>
+
+    <section class="section" id="avaliar">
+      <div class="sectionHead"><div><h2>Danillo, qual é a sua leitura?</h2><p class="sub">Marque favoritos acima, dê notas e deixe uma observação. No final, compartilhe a seleção com o Andrew.</p></div></div>
+      <div class="review">
+        <article class="card">
+          <label for="notes" style="display:block;font-weight:850;margin-bottom:8px">Observações</label>
+          <textarea id="notes" placeholder="Ex.: gostei mais de NOBRIVA porque conecta nobreza + vida…"></textarea>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+            <button class="btn accent" id="shareReview">Compartilhar minha seleção</button>
+            <button class="btn" id="clearReview">Limpar avaliação</button>
+          </div>
+        </article>
+        <aside class="summary">
+          <div class="eyebrow">Minha seleção</div>
+          <h3 style="font-size:24px;margin:8px 0 0">Favoritos e notas</h3>
+          <ul class="summaryList" id="summaryList"><li>Nenhum favorito ainda.</li></ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <article class="card" style="text-align:center;padding:clamp(26px,5vw,50px)">
+        <div class="eyebrow" style="color:var(--muted);opacity:1">A essência em uma frase</div>
+        <h2 style="margin-top:12px">Dois fundadores. Uma nova perspectiva. Uma indústria construída para fazer vidas e negócios crescerem.</h2>
+        <p class="sub">ADIV ainda é um projeto de naming. O conjunto final dependerá da avaliação de marca, domínio, INPI e posicionamento industrial.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer wrap">Protótipo interativo de naming · ADIV · Andrew + Danillo · 2026</footer>
+  <div class="toast" id="toast">Pronto</div>
+
+  <script>
+    (function(){
+      var STORE='adiv_brand_review_v1';
+      var state={favorites:{},scores:{},notes:''};
+      try{state=Object.assign(state,JSON.parse(localStorage.getItem(STORE)||'{}'))}catch(e){}
+      var candidates=[
+        {name:'ADIV NOBRIVA',domain:'adivnobriva.com',idea:'Nobre + vida. Une diretamente a narrativa de Isaías com VIDA/ADIV.',tag:'origem + nobreza'},
+        {name:'ADIV NOBRIS',domain:'adivnobris.com',idea:'Raiz de nobreza com leitura mais institucional e corporativa.',tag:'corporativo'},
+        {name:'ADIV NOBRA',domain:'adivnobra.com',idea:'Nobre + obra. Evoca feitos nobres e construção.',tag:'construção'},
+        {name:'ADIV ALTERUM',domain:'adivalterum.com',idea:'Outro / diferente. Conecta com a ideia de ver a vida de outra forma.',tag:'perspectiva'},
+        {name:'ADIV VERSO',domain:'adivverso.com',idea:'Inversão de VIDA e a ideia de verso/passagem.',tag:'conceitual'},
+        {name:'ADIV PERSPECTA',domain:'adivperspecta.com',idea:'Outra perspectiva. Fala diretamente com o manifesto.',tag:'manifesto'},
+        {name:'ADIV AEVORA',domain:'adivaevora.com',idea:'Nome inventado, sonoro e com alto potencial de distintividade.',tag:'distintividade'},
+        {name:'ADIV NOBRIA',domain:'adivnobria.com',idea:'Nome derivado de nobreza, com sonoridade institucional.',tag:'institucional'}
+      ];
+      var domains=[
+        ['adivnobriva.com','available','strategic','Nobre + vida'],['nobriva.com','available','strategic','Nobre + vida puro'],['adivnobris.com','available','strategic','Nobreza'],['adivnobra.com','available','strategic','Nobre + obra'],
+        ['adivalterum.com','available','strategic','Outra perspectiva'],['adivverso.com','available','strategic','VIDA invertida / verso'],['adivperspecta.com','available','strategic','Perspectiva'],['adivaevora.com','available','strategic','Nome inventado'],['adivnobria.com','available','strategic','Nobreza institucional'],
+        ['adivindustria.com','available','general','Descritor indústria'],['adivnutrition.com','available','general','Descritor nutrição'],['adivgroup.com','available','general','Grupo empresarial'],
+        ['adivnovaris.com','available','general','Novo / variação'],['adivarkena.com','available','general','Nome inventado'],['adivvaleris.com','available','general','Valor / força'],['adivlumera.com','available','general','Luz / expansão'],
+        ['adivorena.com','available','general','Nome inventado'],['adivnobilis.com','available','general','Nobreza'],['adivconatus.com','available','general','Impulso / perseverança'],['adivaedifica.com','available','general','Construir / edificar'],
+        ['adivfides.com','available','general','Fé / confiança'],['adivunitas.com','available','general','Unidade'],['adivaltiora.com','available','general','Elevação'],['adivmovere.com','available','general','Movimento'],
+        ['adivveritas.com','available','general','Verdade'],['adivanima.com','available','general','Alma / vida'],['adivnoriva.com','available','general','Nome inventado'],['adivveriva.com','available','general','Verdade + vida'],
+        ['adivoriva.com','available','general','Origem + vida'],['adivnexum.com','available','general','Conexão'],['adivauctus.com','available','general','Crescimento'],['adivfaber.com','available','general','Fazer / construir'],
+        ['adivordo.com','available','general','Ordem'],['adivpraxis.com','available','general','Ação / prática'],['adivorigenis.com','available','general','Origem'],['adivnoviva.com','available','general','Nova vida'],
+        ['adivvalora.com','available','general','Valor'],['adivelevare.com','available','general','Elevar'],['adivvivra.com','available','general','Vida / vibração'],
+        ['adiv.com','unavailable','general','Domínio puro'],['adivlabs.com','unavailable','general','Labs'],['nobris.com','unavailable','general','Nobris puro'],['alterum.com','unavailable','general','Alterum puro']
+      ];
+      function save(){state.notes=document.getElementById('notes').value;localStorage.setItem(STORE,JSON.stringify(state));renderSummary()}
+      function toast(t){var x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(function(){x.classList.remove('show')},1800)}
+      function renderCandidates(){
+        var g=document.getElementById('candidateGrid');g.innerHTML='';
+        candidates.forEach(function(c){
+          var d=document.createElement('article');d.className='candidate'+(state.favorites[c.name]?' isFav':'');
+          var score=Number(state.scores[c.name]||0);
+          d.innerHTML='<div class="candTop"><div><div class="candName">'+c.name+'</div><div class="domain">'+c.domain+'</div></div><button class="favBtn '+(state.favorites[c.name]?'on':'')+'" aria-label="Favoritar '+c.name+'">'+(state.favorites[c.name]?'♥':'♡')+'</button></div><div style="margin-top:9px"><span class="pill ok">✓ .com disponível</span> <span class="pill">'+c.tag+'</span></div><div class="idea">'+c.idea+'</div><div class="stars" aria-label="Nota de 1 a 5"></div>';
+          d.querySelector('.favBtn').addEventListener('click',function(){state.favorites[c.name]=!state.favorites[c.name];save();renderCandidates()});
+          var stars=d.querySelector('.stars');
+          for(var i=1;i<=5;i++){(function(n){var b=document.createElement('button');b.className='star'+(n<=score?' on':'');b.type='button';b.textContent='★';b.setAttribute('aria-label','Dar nota '+n);b.addEventListener('click',function(){state.scores[c.name]=n;save();renderCandidates()});stars.appendChild(b)})(i)}
+          g.appendChild(d)
+        })
+      }
+      function renderDomains(){
+        var q=document.getElementById('domainSearch').value.trim().toLowerCase();
+        var f=document.getElementById('domainFilter').value;
+        var box=document.getElementById('domainTable');box.innerHTML='';
+        domains.forEach(function(d){
+          var name=d[0],status=d[1],group=d[2],note=d[3];
+          if(q && (name+' '+note).toLowerCase().indexOf(q)===-1)return;
+          if(f==='available'&&status!=='available')return;if(f==='unavailable'&&status!=='unavailable')return;if(f==='strategic'&&group!=='strategic')return;
+          var r=document.createElement('div');r.className='domainRow';
+          r.innerHTML='<div><div class="domainName">'+name+'</div></div><div class="status"><span class="pill '+(status==='available'?'ok':'no')+'">'+(status==='available'?'✓ disponível':'✕ ocupado')+'</span></div><div class="domainNote">'+note+'</div>';
+          box.appendChild(r)
+        })
+      }
+      function renderSummary(){
+        var list=document.getElementById('summaryList');var arr=candidates.filter(function(c){return state.favorites[c.name]});
+        list.innerHTML=arr.length?'':'<li>Nenhum favorito ainda.</li>';
+        arr.forEach(function(c){var li=document.createElement('li');var n=state.scores[c.name]?' · nota '+state.scores[c.name]+'/5':'';li.textContent=c.name+n;list.appendChild(li)})
+      }
+      function reviewText(){
+        var arr=candidates.filter(function(c){return state.favorites[c.name]});
+        var t='Minha avaliação do projeto ADIV:\n\n';
+        if(arr.length){t+='Favoritos:\n';arr.forEach(function(c){t+='• '+c.name+(state.scores[c.name]?' — '+state.scores[c.name]+'/5':'')+'\n'})}else t+='Ainda não marquei favoritos.\n';
+        if(document.getElementById('notes').value.trim())t+='\nObservações:\n'+document.getElementById('notes').value.trim()+'\n';
+        t+='\nConceito: “A vida vista de outra forma.”';return t
+      }
+      function share(){
+        var text=reviewText();
+        if(navigator.share){navigator.share({title:'ADIV — avaliação da marca',text:text,url:location.href}).catch(function(){})}
+        else{window.open('https://wa.me/?text='+encodeURIComponent(text+'\n\n'+location.href),'_blank')}
+      }
+      document.getElementById('notes').value=state.notes||'';
+      document.getElementById('notes').addEventListener('input',save);
+      document.getElementById('domainSearch').addEventListener('input',renderDomains);
+      document.getElementById('domainFilter').addEventListener('change',renderDomains);
+      document.getElementById('shareReview').addEventListener('click',share);
+      document.getElementById('shareTop').addEventListener('click',function(){if(navigator.share)navigator.share({title:'ADIV — A vida vista de outra forma',text:'Veja o conceito interativo da ADIV.',url:location.href}).catch(function(){});else window.open('https://wa.me/?text='+encodeURIComponent('ADIV — A vida vista de outra forma\n'+location.href),'_blank')});
+      document.getElementById('clearReview').addEventListener('click',function(){if(confirm('Limpar favoritos, notas e observações deste aparelho?')){state={favorites:{},scores:{},notes:''};document.getElementById('notes').value='';save();renderCandidates();toast('Avaliação limpa')}})
+      var flipped=false;function flip(){flipped=!flipped;var x=document.getElementById('flipText');x.style.opacity='0';x.style.transform='scale(.96)';setTimeout(function(){x.innerHTML=(flipped?'ADIV':'VIDA')+'<small>'+(flipped?'A vida vista de outra forma':'toque para inverter')+'</small>';x.style.opacity='1';x.style.transform='scale(1)'},140)}
+      document.getElementById('flipButton').addEventListener('click',flip);document.getElementById('flipText').addEventListener('click',flip);document.getElementById('heroFlip').addEventListener('click',function(){document.getElementById('origem').scrollIntoView({behavior:'smooth'});setTimeout(flip,350)});
+      var letterInfo={A:['A — Andrew','Sócio fundador. A primeira letra coloca a origem da sociedade dentro do próprio nome.'],D:['D — Danillo','Sócio fundador. A segunda letra registra a parceria e a construção conjunta.'],I:['I — Inovação','Olhar para trás apenas para aprender: a decisão de não repetir o que não deu certo e construir algo novo e melhor.'],V:['V — Vida','A letra que fecha o nome e revela o coração do conceito: existir, crescer, renovar-se e ver a vida de outra forma.']};
+      document.querySelectorAll('.letter').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.letter').forEach(function(x){x.classList.remove('active')});b.classList.add('active');var p=letterInfo[b.dataset.letter];document.getElementById('letterDetail').innerHTML='<strong>'+p[0]+'</strong><p class="sub">'+p[1]+'</p>'})});
+      renderCandidates();renderDomains();renderSummary();
+    })();
+  </script>
+</body>
+</html>
