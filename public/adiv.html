@@ -380,15 +380,7 @@
 
 <script>
 (function(){
-  const symbol = `<svg viewBox="0 0 180 180" role="img" aria-label="Símbolo ADIV" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="90" cy="22" r="12" fill="#D6336C"/>
-    <path d="M20 47 C47 43 70 51 90 72 C110 51 133 43 160 47 C136 59 116 79 101 105 L90 131 L79 105 C64 79 44 59 20 47Z" fill="#D6336C"/>
-    <path d="M15 65 C42 62 63 72 79 92 C62 89 44 95 28 113 C20 100 16 83 15 65Z" fill="#D6336C"/>
-    <path d="M165 65 C138 62 117 72 101 92 C118 89 136 95 152 113 C160 100 164 83 165 65Z" fill="#D6336C"/>
-    <path d="M27 110 C48 101 66 103 90 151 C114 103 132 101 153 110 C130 119 111 134 90 165 C69 134 50 119 27 110Z" fill="#D6336C"/>
-    <path d="M42 79 C58 83 69 92 79 110 C65 102 53 98 40 100 C43 93 44 86 42 79Z" fill="#F7F3EE"/>
-    <path d="M138 79 C122 83 111 92 101 110 C115 102 127 98 140 100 C137 93 136 86 138 79Z" fill="#F7F3EE"/>
-  </svg>`;
+  const symbol = '<img src="/adiv-symbol.png" alt="Símbolo ADIV" style="width:100%;height:100%;object-fit:contain;display:block">';
   document.querySelectorAll('[data-symbol]').forEach(el=>el.innerHTML=symbol);
 
   const STORE='adiv_brand_review_v2';
