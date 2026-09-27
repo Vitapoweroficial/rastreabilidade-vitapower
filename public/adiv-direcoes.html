@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#102f2a">
+<meta name="description" content="ADIV — experiência interativa para comparar direções de identidade e decidir a aura da marca.">
+<title>ADIV — Escolha da Aura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --emerald:#173c35;--emerald2:#0d2f2a;--ivory:#f4f0e7;--ink:#222220;--muted:#6f6a63;
+  --champ:#b69a67;--line:#d9d0c3;--white:#fff;--soft:#ebe5d9;--rose:#d6336c;
+  --shadow:0 24px 70px rgba(20,35,30,.09);--r:26px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ivory);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.wrap{width:min(1180px,calc(100% - 24px));margin:0 auto}
+.top{position:sticky;top:0;z-index:40;background:rgba(244,240,231,.91);backdrop-filter:blur(18px);border-bottom:1px solid rgba(182,154,103,.22)}
+.topin{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+.brand img{width:37px;height:37px;object-fit:contain}
+.brand b{font-family:"Cormorant Garamond",serif;font-size:27px;letter-spacing:.08em}
+.top-actions{display:flex;gap:8px}
+.btn{min-height:44px;border:1px solid var(--line);border-radius:999px;background:white;color:var(--ink);padding:0 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.primary{background:var(--emerald);border-color:var(--emerald);color:var(--ivory)}
+.btn.gold{background:var(--champ);border-color:var(--champ);color:#17130d}
+.btn.ghost{background:transparent}
+main{padding:28px 0 72px}
+.serif{font-family:"Cormorant Garamond",serif}
+.hero{background:linear-gradient(135deg,#0f312b,#173c35 52%,#214a42);color:var(--ivory);border-radius:34px;padding:clamp(28px,6vw,66px);position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero:after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;right:-120px;top:-190px;background:radial-gradient(circle,rgba(182,154,103,.24),rgba(182,154,103,0) 68%)}
+.hero>*{position:relative;z-index:2}
+.kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--champ)}
+.hero h1{font-family:"Cormorant Garamond",serif;font-size:clamp(48px,8vw,88px);line-height:.94;letter-spacing:-.025em;margin:18px 0 14px;max-width:930px;font-weight:600}
+.hero p{max-width:750px;color:#ddd7cc;font-size:16px;line-height:1.7}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.chip{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 11px;font-size:12px;color:#efe9df}
+.section{margin-top:28px}
+.section-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:13px}
+.section h2{font-family:"Cormorant Garamond",serif;font-size:clamp(34px,5vw,50px);line-height:1.02;margin:0;font-weight:600}
+.sub{color:var(--muted);font-size:14px;line-height:1.65;margin:7px 0 0}
+.instructions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.step{background:white;border:1px solid var(--line);border-radius:20px;padding:18px}
+.step span{display:inline-flex;width:30px;height:30px;border-radius:50%;align-items:center;justify-content:center;background:var(--emerald);color:white;font-size:12px;font-weight:700}
+.step b{display:block;margin-top:11px}
+.step p{color:var(--muted);font-size:13px;line-height:1.55;margin:6px 0 0}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tab{border:1px solid var(--line);border-radius:18px;background:white;padding:16px;text-align:left;min-height:110px;transition:.2s}
+.tab[aria-selected="true"]{border-color:var(--emerald);box-shadow:0 0 0 2px rgba(23,60,53,.08);background:#fbfaf6}
+.tab small{display:block;color:var(--champ);font-size:10px;letter-spacing:.14em;font-weight:700}
+.tab strong{display:block;font-family:"Cormorant Garamond",serif;font-size:24px;margin-top:7px}
+.tab em{display:block;color:var(--muted);font-style:normal;font-size:12px;margin-top:4px}
+.stage{display:grid;grid-template-columns:1.14fr .86fr;gap:14px;margin-top:14px}
+.visual{min-height:520px;border-radius:28px;overflow:hidden;position:relative;border:1px solid var(--line);box-shadow:var(--shadow)}
+.visual-inner{position:absolute;inset:0;padding:30px;display:flex;flex-direction:column;justify-content:space-between}
+.logo-row{display:flex;align-items:center;gap:13px}
+.logo-row img{width:64px;height:64px;object-fit:contain}
+.logo-word{font-family:"Cormorant Garamond",serif;font-size:58px;line-height:.8;letter-spacing:.08em;font-weight:600}
+.descriptor{margin-top:9px;font-size:9px;letter-spacing:.25em;text-transform:uppercase}
+.visual-copy{max-width:650px}
+.visual-copy h3{font-family:"Cormorant Garamond",serif;font-size:clamp(38px,5vw,58px);line-height:.98;margin:0;font-weight:600;letter-spacing:-.02em}
+.visual-copy p{font-size:14px;line-height:1.65;max-width:540px;margin:13px 0 0}
+.mock-products{display:flex;align-items:flex-end;gap:12px;justify-content:flex-end;margin-top:16px}
+.jar,.box,.bottle{border-radius:12px;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-family:"Cormorant Garamond",serif;font-size:18px;letter-spacing:.06em}
+.jar{width:84px;height:110px}.box{width:86px;height:145px;border-radius:6px}.bottle{width:64px;height:128px;border-radius:18px 18px 10px 10px}
+.info{display:grid;gap:12px}
+.info-card{background:white;border:1px solid var(--line);border-radius:20px;padding:18px}
+.info-card h4{margin:0;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.info-card p{margin:8px 0 0;font-size:14px;line-height:1.62}
+.palette{display:flex;gap:8px;margin-top:10px}
+.sw{width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,0,0,.08)}
+.metric{margin-top:12px}
+.metric-top{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.bar{height:7px;background:#eee9df;border-radius:999px;overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;background:var(--emerald);border-radius:999px}
+.mixer{display:grid;grid-template-columns:1fr .92fr;gap:14px}
+.mixer-card,.result-card{background:white;border:1px solid var(--line);border-radius:24px;padding:20px}
+.range-row{display:grid;grid-template-columns:150px 1fr 38px;gap:12px;align-items:center;margin:14px 0}
+.range-row label{font-size:13px;font-weight:600}
+.range-row input{width:100%;accent-color:var(--emerald)}
+.range-row output{text-align:right;font-size:12px;color:var(--muted)}
+.score-grid{display:grid;gap:10px}
+.score{border:1px solid var(--line);border-radius:16px;padding:14px}
+.score-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.score-name{font-family:"Cormorant Garamond",serif;font-size:22px}
+.score-value{font-weight:800;color:var(--emerald)}
+.score .bar{height:8px}
+.synthesis{margin-top:14px;background:var(--emerald2);color:var(--ivory);border-radius:18px;padding:16px}
+.synthesis small{color:var(--champ);letter-spacing:.14em;font-weight:700}
+.synthesis strong{display:block;font-family:"Cormorant Garamond",serif;font-size:24px;margin-top:7px}
+.synthesis p{margin:6px 0 0;color:#d8d0c4;font-size:13px;line-height:1.55}
+.compare{overflow:auto;border:1px solid var(--line);border-radius:20px;background:white}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:13px 15px;border-top:1px solid var(--line);text-align:left;font-size:13px}
+thead th{border-top:0;background:#f1ece2;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+td:first-child{font-weight:700}
+.decision{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+.vote-panel,.share-panel{background:white;border:1px solid var(--line);border-radius:24px;padding:20px}
+.votes{display:grid;gap:9px;margin-top:14px}
+.vote{min-height:54px;border:1px solid var(--line);background:#fff;border-radius:14px;text-align:left;padding:0 14px;font-weight:700}
+.vote[aria-pressed="true"]{background:var(--emerald);color:white;border-color:var(--emerald)}
+textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:14px;padding:13px;background:#fbfaf6;font-size:16px;resize:vertical;margin-top:10px}
+.summary{background:var(--emerald2);color:white;border-radius:17px;padding:16px;margin-top:12px}
+.summary small{color:var(--champ);letter-spacing:.14em}
+.summary p{font-size:13px;line-height:1.6;color:#ded7cd;margin:8px 0 0}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:28px 0 8px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:10px 14px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:80}
+.toast.show{opacity:1}
+@media(max-width:880px){
+  .stage,.mixer,.decision{grid-template-columns:1fr}
+  .instructions,.tabs{grid-template-columns:1fr}
+  .visual{min-height:470px}
+}
+@media(max-width:600px){
+  .wrap{width:min(100% - 16px,1180px)}
+  .top-actions .btn.ghost{display:none}
+  .hero{border-radius:24px;padding:28px 22px}
+  .visual-inner{padding:22px}
+  .logo-row img{width:50px;height:50px}.logo-word{font-size:46px}
+  .mock-products{justify-content:flex-start}
+  .range-row{grid-template-columns:110px 1fr 32px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap topin">
+    <a class="brand" href="#top"><img src="/adiv-symbol.png" alt="Símbolo ADIV"><b>ADIV</b></a>
+    <div class="top-actions">
+      <button class="btn ghost" id="resetBtn">Recomeçar</button>
+      <button class="btn primary" id="shareTop">Compartilhar</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <section class="hero">
+    <div class="kicker">Andrew + Danillo · Experiência de decisão</div>
+    <h1>Qual aura deve conduzir a ADIV?</h1>
+    <p>Não é uma apresentação. É uma mesa de decisão interativa para vocês sentirem, comparar e escolher que emoção a marca precisa provocar — hoje no private label e amanhã como uma grande indústria de saúde.</p>
+    <div class="hero-chips">
+      <span class="chip">alto padrão</span><span class="chip">minimalismo</span><span class="chip">private label</span><span class="chip">saúde</span><span class="chip">escala</span><span class="chip">futuro farmacêutico</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><div class="kicker">Como usar</div><h2>Decidir sentindo, não só olhando.</h2></div></div>
+    <div class="instructions">
+      <div class="step"><span>1</span><b>Explore as três direções</b><p>Toque em cada versão e observe não só a estética, mas a sensação que ela gera no cliente.</p></div>
+      <div class="step"><span>2</span><b>Ajuste a aura desejada</b><p>Definam juntos quanto luxo, ciência, emoção, força industrial e futuro a ADIV precisa transmitir.</p></div>
+      <div class="step"><span>3</span><b>Cheguem à síntese</b><p>A melhor identidade pode nascer da combinação disciplinada do melhor de duas ou três direções.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="direcoes">
+    <div class="section-head">
+      <div><div class="kicker">Três caminhos</div><h2>A mesma essência. Três primeiras impressões.</h2><p class="sub">A pergunta não é “qual está mais bonita?”. É “qual delas faz o cliente confiar, desejar e imaginar a própria marca crescendo com a ADIV?”.</p></div>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" data-v="1" aria-selected="true"><small>VERSÃO 1</small><strong>Luxo Institucional</strong><em>presença · legado · confiança</em></button>
+      <button class="tab" data-v="2" aria-selected="false"><small>VERSÃO 2</small><strong>Luxo Farmacêutico</strong><em>ciência · precisão · futuro</em></button>
+      <button class="tab" data-v="3" aria-selected="false"><small>VERSÃO 3</small><strong>Private Label Premium</strong><em>desejo · parceria · realização</em></button>
+    </div>
+
+    <div class="stage">
+      <div class="visual" id="visual">
+        <div class="visual-inner" id="visualInner">
+          <div class="logo-row">
+            <img src="/adiv-symbol.png" alt="">
+            <div><div class="logo-word">ADIV</div><div class="descriptor" id="descriptor">PRIVATE LABEL MANUFACTURING</div></div>
+          </div>
+          <div>
+            <div class="visual-copy">
+              <h3 id="headline">Sua marca na frente.<br>Nossa indústria por trás.</h3>
+              <p id="bodyCopy">Private label de alto padrão para marcas que querem crescer com segurança, qualidade e escala.</p>
+            </div>
+            <div class="mock-products" id="products">
+              <div class="jar">ADIV</div><div class="bottle">ADIV</div><div class="box">ADIV</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info">
+        <div class="info-card"><h4>O que o cliente sente</h4><p id="feeling">“Posso colocar minha marca na mão deles.”</p></div>
+        <div class="info-card"><h4>Onde essa direção brilha</h4><p id="strength">Transmite confiança, longevidade e capacidade para atender marcas maiores.</p></div>
+        <div class="info-card"><h4>O risco</h4><p id="risk">Se ficar formal demais, pode perder parte da energia empreendedora do private label.</p></div>
+        <div class="info-card">
+          <h4>Paleta e intensidade</h4>
+          <div class="palette" id="palette"></div>
+          <div class="metric"><div class="metric-top"><span>Luxo</span><span id="mLux">92</span></div><div class="bar"><i id="bLux" style="width:92%"></i></div></div>
+          <div class="metric"><div class="metric-top"><span>Ciência</span><span id="mSci">68</span></div><div class="bar"><i id="bSci" style="width:68%"></i></div></div>
+          <div class="metric"><div class="metric-top"><span>Emoção</span><span id="mEmo">54</span></div><div class="bar"><i id="bEmo" style="width:54%"></i></div></div>
+          <div class="metric"><div class="metric-top"><span>Força industrial</span><span id="mInd">90</span></div><div class="bar"><i id="bInd" style="width:90%"></i></div></div>
+          <div class="metric"><div class="metric-top"><span>Futuro farmacêutico</span><span id="mFut">78</span></div><div class="bar"><i id="bFut" style="width:78%"></i></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="aura">
+    <div class="section-head">
+      <div><div class="kicker">Mixer de aura</div><h2>O que vocês querem que o cliente sinta?</h2><p class="sub">Movam os controles. O sistema mostra qual direção se aproxima mais da ADIV que vocês estão imaginando.</p></div>
+    </div>
+    <div class="mixer">
+      <div class="mixer-card">
+        <div class="range-row"><label>Luxo / alto padrão</label><input type="range" min="0" max="100" value="92" data-k="lux"><output>92</output></div>
+        <div class="range-row"><label>Ciência / precisão</label><input type="range" min="0" max="100" value="82" data-k="sci"><output>82</output></div>
+        <div class="range-row"><label>Emoção / sonho</label><input type="range" min="0" max="100" value="82" data-k="emo"><output>82</output></div>
+        <div class="range-row"><label>Força industrial</label><input type="range" min="0" max="100" value="88" data-k="ind"><output>88</output></div>
+        <div class="range-row"><label>Futuro farmacêutico</label><input type="range" min="0" max="100" value="90" data-k="fut"><output>90</output></div>
+      </div>
+      <div class="result-card">
+        <div class="kicker">Aderência às três direções</div>
+        <div class="score-grid" id="scores"></div>
+        <div class="synthesis">
+          <small>SÍNTESE SUGERIDA</small>
+          <strong id="synthTitle">Desejo de private label + precisão farmacêutica + estatura institucional.</strong>
+          <p id="synthBody">A direção mais forte provavelmente não será uma cópia de uma das três, mas uma quarta versão construída com disciplina a partir do que realmente importa para vocês.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><div class="kicker">Comparação direta</div><h2>O que muda de verdade entre elas.</h2></div></div>
+    <div class="compare">
+      <table>
+        <thead><tr><th>Leitura</th><th>V1 · Institucional</th><th>V2 · Farmacêutico</th><th>V3 · Private Label</th></tr></thead>
+        <tbody>
+          <tr><td>Primeira impressão</td><td>Grande indústria premium</td><td>Ciência e precisão</td><td>Marca desejável e parceira</td></tr>
+          <tr><td>Conexão com private label</td><td>Forte</td><td>Equilibrada</td><td>Muito forte</td></tr>
+          <tr><td>Preparação para farmacêutico</td><td>Forte</td><td>Muito forte</td><td>Forte</td></tr>
+          <tr><td>Calor humano / sonho</td><td>Equilibrado</td><td>Mais contido</td><td>Muito forte</td></tr>
+          <tr><td>Minimalismo</td><td>Médio</td><td>Muito alto</td><td>Alto</td></tr>
+          <tr><td>Maior risco</td><td>Ficar clássico demais</td><td>Ficar frio demais</td><td>Parecer beauty/cosmético</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" id="decisao">
+    <div class="section-head">
+      <div><div class="kicker">Decisão dos fundadores</div><h2>Andrew e Danillo precisam decidir juntos.</h2><p class="sub">Escolham as direções que merecem sobreviver para a próxima rodada. Pode selecionar mais de uma.</p></div>
+    </div>
+    <div class="decision">
+      <div class="vote-panel">
+        <div class="votes">
+          <button class="vote" data-vote="1" aria-pressed="false">♡ Luxo Institucional</button>
+          <button class="vote" data-vote="2" aria-pressed="false">♡ Luxo Farmacêutico</button>
+          <button class="vote" data-vote="3" aria-pressed="false">♡ Private Label Premium</button>
+        </div>
+        <textarea id="notes" placeholder="Escreva aqui o que mais gostou, o que mudaria e o que a ADIV jamais pode parecer…"></textarea>
+      </div>
+      <div class="share-panel">
+        <div class="kicker">Resultado desta conversa</div>
+        <div class="summary">
+          <small>SELEÇÃO</small>
+          <p id="summaryText">Nenhuma direção selecionada ainda.</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="shareDecision">Enviar minha escolha pelo WhatsApp</button>
+          <button class="btn" id="copySummary">Preparar resumo</button>
+        </div>
+        <p class="sub">As escolhas ficam salvas neste aparelho. O botão do WhatsApp envia o resumo + este mesmo link.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer wrap">ADIV · Experiência de Identidade · Andrew + Danillo</footer>
+<div class="toast" id="toast">Pronto</div>
+
+<script>
+(()=>{
+const data={
+1:{name:'Luxo Institucional',desc:'PRIVATE LABEL MANUFACTURING',head:'Sua marca na frente.<br>Nossa indústria por trás.',body:'Private label de alto padrão para marcas que querem crescer com segurança, qualidade e escala.',feeling:'“Posso colocar minha marca na mão deles.”',strength:'Transmite confiança, longevidade e capacidade para atender marcas maiores.',risk:'Se ficar formal demais, pode perder parte da energia empreendedora do private label.',colors:['#173C35','#F4F0E7','#222220','#B69A67'],scores:{lux:92,sci:68,emo:54,ind:90,fut:78},bg:'#F4F0E7',fg:'#173C35',product:['#6c4a2d','#eee6d5','#173c35']},
+2:{name:'Luxo Farmacêutico',desc:'HEALTH MANUFACTURING',head:'Ciência que transforma<br>ideias em marcas.',body:'Precisão, qualidade e tecnologia para produtos preparados para um futuro maior.',feeling:'“Eles têm método, tecnologia e padrão para crescer muito.”',strength:'É a direção que melhor prepara visualmente a ADIV para uma futura expansão farmacêutica.',risk:'Pode parecer fria ou distante demais para o empreendedor que está realizando sua primeira marca.',colors:['#103F38','#F7F5EF','#222220','#B9A071'],scores:{lux:86,sci:96,emo:36,ind:94,fut:98},bg:'#F7F5EF',fg:'#103F38',product:['#173c35','#f5f1e8','#1c1c1c']},
+3:{name:'Private Label Premium',desc:'PREMIUM PRIVATE LABEL',head:'Nós tornamos<br>marcas possíveis.',body:'Uma indústria criada para transformar o sonho de empreendedores em produtos desejáveis e negócios preparados para crescer.',feeling:'“Eles entenderam que minha marca é meu sonho, não apenas um pedido de produção.”',strength:'É a mais emocional e comercial para o private label atual; cria desejo e aproxima o fundador.',risk:'Se abusarmos de lifestyle e dourado, pode parecer beauty/cosmético e reduzir a percepção industrial.',colors:['#173C35','#F4F0E7','#222220','#B69A67'],scores:{lux:94,sci:58,emo:96,ind:78,fut:74},bg:'#173C35',fg:'#F4F0E7',product:['#52311b','#f1eadc','#0c3a32']}
+};
+const root=document;
+const tabs=[...root.querySelectorAll('.tab')];
+const votes=new Set(JSON.parse(localStorage.getItem('adivVotes')||'[]'));
+const noteEl=root.getElementById('notes');
+noteEl.value=localStorage.getItem('adivNotes')||'';
+function toast(t){const x=root.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1400)}
+function renderVersion(v){
+ const d=data[v];tabs.forEach(b=>b.setAttribute('aria-selected',b.dataset.v==v?'true':'false'));
+ const vi=root.getElementById('visualInner');vi.style.background=d.bg;vi.style.color=d.fg;
+ root.getElementById('descriptor').textContent=d.desc;root.getElementById('headline').innerHTML=d.head;root.getElementById('bodyCopy').textContent=d.body;
+ root.getElementById('feeling').textContent=d.feeling;root.getElementById('strength').textContent=d.strength;root.getElementById('risk').textContent=d.risk;
+ const p=root.getElementById('palette');p.innerHTML='';d.colors.forEach(c=>{const s=document.createElement('span');s.className='sw';s.style.background=c;s.title=c;p.appendChild(s)});
+ [['Lux','lux'],['Sci','sci'],['Emo','emo'],['Ind','ind'],['Fut','fut']].forEach(([id,k])=>{root.getElementById('m'+id).textContent=d.scores[k];root.getElementById('b'+id).style.width=d.scores[k]+'%'});
+ [...root.getElementById('products').children].forEach((el,i)=>{el.style.background=d.product[i];el.style.color=i==1?'#222':'#f4f0e7';el.style.borderColor='rgba(182,154,103,.45)'});
+}
+tabs.forEach(b=>b.addEventListener('click',()=>renderVersion(b.dataset.v)));
+function fit(user,d){
+ const ks=['lux','sci','emo','ind','fut'];let sum=0;ks.forEach(k=>sum+=Math.abs(user[k]-d.scores[k]));return Math.max(0,Math.round(100-sum/(ks.length)));
+}
+function updateMixer(){
+ const user={};root.querySelectorAll('input[type=range]').forEach(i=>{user[i.dataset.k]=+i.value;i.nextElementSibling.value=i.value});
+ const ranked=Object.entries(data).map(([v,d])=>({v:+v,name:d.name,score:fit(user,d)})).sort((a,b)=>b.score-a.score);
+ const box=root.getElementById('scores');box.innerHTML='';ranked.forEach(r=>{const el=document.createElement('div');el.className='score';el.innerHTML='<div class="score-top"><span class="score-name">'+r.name+'</span><span class="score-value">'+r.score+'%</span></div><div class="bar"><i style="width:'+r.score+'%"></i></div>';box.appendChild(el)});
+ const top=ranked[0],second=ranked[1];let title='',body='';
+ if(Math.abs(top.score-second.score)<=7){title='A melhor saída é uma síntese — não uma cópia.';body='As preferências de vocês estão cruzando '+top.name+' com '+second.name+'. Isso indica que a identidade final deve combinar emoção, disciplina e estatura em uma quarta versão própria da ADIV.'}
+ else{title=top.name+' está mais próxima da aura desejada.';body='Ela é o melhor ponto de partida pelos controles atuais. Mesmo assim, vale importar apenas os melhores elementos das outras direções, sem perder coerência.'}
+ root.getElementById('synthTitle').textContent=title;root.getElementById('synthBody').textContent=body;
+}
+root.querySelectorAll('input[type=range]').forEach(i=>i.addEventListener('input',updateMixer));
+function renderVotes(){
+ root.querySelectorAll('.vote').forEach(b=>{const on=votes.has(+b.dataset.vote);b.setAttribute('aria-pressed',on?'true':'false');b.textContent=(on?'♥ ':'♡ ')+data[b.dataset.vote].name});
+ localStorage.setItem('adivVotes',JSON.stringify([...votes]));
+ const names=[...votes].map(v=>data[v].name);
+ root.getElementById('summaryText').textContent=names.length?('Direções que devem continuar: '+names.join(' + ')+'.'):'Nenhuma direção selecionada ainda.';
+}
+root.querySelectorAll('.vote').forEach(b=>b.addEventListener('click',()=>{const v=+b.dataset.vote;votes.has(v)?votes.delete(v):votes.add(v);renderVotes()}));
+noteEl.addEventListener('input',()=>localStorage.setItem('adivNotes',noteEl.value));
+function summary(){
+ const names=[...votes].map(v=>data[v].name);let t='ADIV — Minha leitura das direções\n\n';
+ t+='Quero levar adiante: '+(names.length?names.join(' + '):'ainda não selecionei uma direção')+'.\n';
+ const note=noteEl.value.trim();if(note)t+='\nObservações:\n'+note+'\n';
+ t+='\nA ideia central continua: private label de alto padrão hoje, construção de uma grande plataforma industrial de saúde no longo prazo.\n';
+ return t;
+}
+function share(){
+ const text=summary();const url=location.href;
+ if(navigator.share){navigator.share({title:'ADIV — Escolha da Aura',text,url}).catch(()=>{})}
+ else{window.open('https://wa.me/?text='+encodeURIComponent(text+'\n'+url),'_blank')}
+}
+root.getElementById('shareDecision').addEventListener('click',share);
+root.getElementById('shareTop').addEventListener('click',share);
+root.getElementById('copySummary').addEventListener('click',()=>{noteEl.value=(noteEl.value?noteEl.value+'\n\n':'')+summary();localStorage.setItem('adivNotes',noteEl.value);toast('Resumo colocado nas observações')});
+root.getElementById('resetBtn').addEventListener('click',()=>{if(confirm('Recomeçar esta avaliação?')){votes.clear();localStorage.removeItem('adivVotes');localStorage.removeItem('adivNotes');noteEl.value='';root.querySelectorAll('input[type=range]').forEach((i,idx)=>i.value=[92,82,82,88,90][idx]);renderVotes();updateMixer();renderVersion(1);toast('Avaliação reiniciada')}});
+renderVersion(1);renderVotes();updateMixer();
+})();
+</script>
+</body>
+</html>
