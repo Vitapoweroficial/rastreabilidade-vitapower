@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       {
         source: "/adiv-direcoes",
         destination: "/adiv-direcoes.html"
+      },
+      {
+        source: "/adiv-origem",
+        destination: "/adiv-origem.html"
       }
     ];
   }
