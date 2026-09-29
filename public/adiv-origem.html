@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F7F0E6">
+<meta name="description" content="ADIV — A vida vista de outra forma. Origem, significado e propósito do nome.">
+<title>ADIV — A Vida Vista de Outra Forma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F7F0E6;--rose:#D9A8A0;--sage:#9AAA8F;--sand:#D9C6AA;--brown:#54463D;
+  --white:#FFFCF8;--line:#E2D6C8;--muted:#756B63;--green-soft:#EDF0E7;--rose-soft:#F3E3DF;
+  --shadow:0 22px 70px rgba(84,70,61,.08);--r:28px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--brown);font-family:Inter,system-ui,sans-serif}
+button{font:inherit;cursor:pointer}
+a{color:inherit}
+.wrap{width:min(100% - 22px,980px);margin:0 auto}
+.top{position:sticky;top:0;z-index:40;background:rgba(247,240,230,.91);backdrop-filter:blur(16px);border-bottom:1px solid rgba(226,214,200,.8)}
+.topin{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand img{width:39px;height:39px;object-fit:contain;filter:saturate(.55) sepia(.16)}
+.brand b{font-family:"Cormorant Garamond",serif;font-size:28px;letter-spacing:.08em}
+.btn{min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--white);color:var(--brown);padding:0 15px;font-weight:700}
+.btn.primary{background:var(--brown);border-color:var(--brown);color:var(--cream)}
+main{padding:24px 0 68px}
+.serif{font-family:"Cormorant Garamond",serif}
+.hero{background:linear-gradient(135deg,#F7F0E6,#F0E4D5);border:1px solid var(--line);border-radius:34px;padding:clamp(26px,7vw,60px);box-shadow:var(--shadow);overflow:hidden;position:relative}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;opacity:.55;pointer-events:none}
+.hero:before{width:260px;height:260px;background:#D9A8A0;right:-110px;top:-120px;filter:blur(2px)}
+.hero:after{width:210px;height:210px;background:#9AAA8F;left:-90px;bottom:-120px}
+.hero>*{position:relative;z-index:2}
+.kicker{text-transform:uppercase;letter-spacing:.22em;font-size:11px;font-weight:700;color:var(--muted)}
+.lockup{display:flex;align-items:center;gap:18px;margin-top:22px}
+.lockup img{width:86px;height:86px;object-fit:contain;filter:saturate(.45) sepia(.25) hue-rotate(330deg)}
+.word{font-family:"Cormorant Garamond",serif;font-size:clamp(58px,15vw,102px);line-height:.8;letter-spacing:.07em;font-weight:600}
+.tagline{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(30px,7vw,52px);line-height:1.05;margin:28px 0 0}
+.lead{max-width:720px;font-size:15px;line-height:1.75;color:var(--muted);margin:16px 0 0}
+.section{margin-top:22px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:0 8px 28px rgba(84,70,61,.035)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+h2{font-family:"Cormorant Garamond",serif;font-size:clamp(34px,7vw,48px);line-height:1.02;margin:0;font-weight:600}
+.sub{color:var(--muted);font-size:14px;line-height:1.65}
+.flip-stage{min-height:220px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#F7F0E6,#F0E5D8);border-radius:22px;margin-top:14px}
+.flip-word{font-family:"Cormorant Garamond",serif;font-size:clamp(70px,18vw,116px);letter-spacing:.06em;transition:.25s ease}
+.flip-caption{text-align:center;color:var(--muted);font-size:13px;margin-top:9px}
+.letters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.letter{min-height:76px;border:1px solid var(--line);background:var(--white);border-radius:18px;font-size:28px;font-weight:700;color:var(--brown)}
+.letter.active{background:var(--rose-soft);border-color:#D8AAA1}
+.detail{margin-top:12px;background:var(--cream);border-radius:18px;padding:16px}
+.detail strong{font-family:"Cormorant Garamond",serif;font-size:24px}
+.detail p{margin:7px 0 0;color:var(--muted);font-size:14px;line-height:1.6}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tab{min-height:42px;border:1px solid var(--line);background:var(--white);border-radius:999px;padding:0 14px;font-size:13px}
+.tab.active{background:var(--green-soft);border-color:#B9C4B0}
+.story{margin-top:12px;background:var(--green-soft);border-radius:18px;padding:17px;font-size:14px;line-height:1.7}
+.quote{background:#F4E8DF;border-left:5px solid var(--rose);border-radius:6px 22px 22px 6px;padding:22px}
+.quote blockquote{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(28px,6vw,40px);line-height:1.15;margin:0}
+.quote small{display:block;margin-top:10px;color:var(--muted)}
+.meanings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.meaning{border-radius:18px;padding:16px}
+.meaning:nth-child(1){background:#F7F0E6}.meaning:nth-child(2){background:#EDF0E7}.meaning:nth-child(3){background:#F1E7DC}
+.meaning b{display:block}.meaning p{margin:6px 0 0;font-size:13px;color:var(--muted);line-height:1.55}
+.palette{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.swatch{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:8px 10px;background:var(--white);font-size:12px}
+.swatch i{width:24px;height:24px;border-radius:50%;display:block}
+.final{background:var(--brown);color:var(--cream);border-radius:30px;padding:28px;text-align:center}
+.final .serif{font-size:clamp(32px,7vw,50px);line-height:1.05}
+.final p{max-width:680px;margin:14px auto 0;color:#E7DED4;font-size:14px;line-height:1.7}
+.sharebar{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2F2925;color:white;border-radius:999px;padding:10px 14px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:60}
+.toast.show{opacity:1}
+@media(max-width:720px){
+  .grid2,.meanings{grid-template-columns:1fr}
+  .lockup img{width:68px;height:68px}
+  .letters{gap:6px}
+  .letter{min-height:66px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap topin">
+    <a class="brand" href="#top"><img src="/adiv-symbol.png" alt="Símbolo ADIV"><b>ADIV</b></a>
+    <button class="btn primary" id="shareTop">Compartilhar</button>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <section class="hero">
+    <div class="kicker">Origem · significado · propósito</div>
+    <div class="lockup">
+      <img src="/adiv-symbol.png" alt="Símbolo ADIV">
+      <div>
+        <div class="word">ADIV</div>
+        <div class="kicker" style="margin-top:9px">A vida vista de outra forma</div>
+      </div>
+    </div>
+    <div class="tagline">Antes de ser uma empresa,<br>ADIV é uma forma de olhar a vida.</div>
+    <p class="lead">O nome carrega os fundadores, a inovação, a vida e uma inspiração de nobreza de propósito. Esta apresentação foi feita para contar a história por trás da marca de forma simples, humana e afetiva.</p>
+  </section>
+
+  <section class="section grid2">
+    <article class="card">
+      <div class="kicker">A descoberta</div>
+      <div class="flip-stage"><div><div class="flip-word" id="flipWord">ADIV</div><div class="flip-caption" id="flipCaption">Toque abaixo para revelar a origem.</div></div></div>
+      <button class="btn" id="flipBtn" style="width:100%;margin-top:12px">↔ Inverter o nome</button>
+    </article>
+    <article class="card">
+      <div class="kicker">O significado central</div>
+      <h2 style="margin-top:10px">VIDA escrita ao contrário forma ADIV.</h2>
+      <p class="sub">A inversão não é apenas visual. Ela representa uma decisão de olhar para a vida, para os negócios e para o futuro sob outra perspectiva.</p>
+      <div style="margin-top:14px;background:var(--green-soft);border-radius:18px;padding:15px"><b>ADIV</b><div class="sub" style="margin-top:4px">Nada mais, nada menos que <strong>a vida vista de outra forma.</strong></div></div>
+    </article>
+  </section>
+
+  <section class="section card">
+    <div class="kicker">As quatro letras</div>
+    <h2 style="margin-top:8px">O nome também carrega quem o constrói.</h2>
+    <div class="letters">
+      <button class="letter active" data-letter="A">A</button>
+      <button class="letter" data-letter="D">D</button>
+      <button class="letter" data-letter="I">I</button>
+      <button class="letter" data-letter="V">V</button>
+    </div>
+    <div class="detail" id="letterDetail"><strong>A — Andrew</strong><p>Sócio fundador. A primeira letra coloca dentro do próprio nome a história de quem está começando essa construção.</p></div>
+  </section>
+
+  <section class="section card">
+    <div class="kicker">Camadas do nome</div>
+    <div class="tabs">
+      <button class="tab active" data-story="vida">Vida</button>
+      <button class="tab" data-story="fundadores">Fundadores</button>
+      <button class="tab" data-story="inovacao">Inovação</button>
+      <button class="tab" data-story="proposito">Propósito</button>
+    </div>
+    <div class="story" id="storyPanel">A camada mais memorável: ADIV é VIDA invertida. Uma nova maneira de enxergar a vida, aprender com o passado e construir o futuro.</div>
+  </section>
+
+  <section class="section grid2">
+    <article class="quote">
+      <div class="kicker">Inspiração espiritual</div>
+      <blockquote>“Mas o nobre projeta coisas nobres e na sua nobreza perseverará.”</blockquote>
+      <small>Isaías 32:8</small>
+      <p class="sub">Na construção da marca, essa passagem representa a intenção de fazer planos nobres, construir algo bom e permanecer firme naquilo que possui valor.</p>
+    </article>
+    <article class="card">
+      <div class="kicker">Uma leitura importante</div>
+      <h2 style="margin-top:10px">Nobreza não como status, mas como intenção.</h2>
+      <p class="sub">A inspiração espiritual entra aqui como princípio: gentileza, generosidade, firmeza e desejo de construir algo que faça bem às pessoas. É inspiração para a marca — não uma tradução literal do nome.</p>
+    </article>
+  </section>
+
+  <section class="section card">
+    <div class="kicker">O símbolo</div>
+    <h2 style="margin-top:8px">Uma pessoa no centro. Vida crescendo ao redor.</h2>
+    <div class="meanings">
+      <div class="meaning"><b>A pessoa</b><p>O ser humano está no centro. A empresa começa e termina em pessoas, sonhos e vidas.</p></div>
+      <div class="meaning"><b>As folhas</b><p>Representam saúde, crescimento, renovação e aquilo que ganha vida.</p></div>
+      <div class="meaning"><b>O V</b><p>Conecta visualmente o símbolo à palavra VIDA e reforça a ideia de crescimento.</p></div>
+    </div>
+  </section>
+
+  <section class="section card">
+    <div class="kicker">Paleta desta narrativa</div>
+    <h2 style="margin-top:8px">Humana, natural e acolhedora.</h2>
+    <div class="palette">
+      <span class="swatch"><i style="background:#D9A8A0"></i>Rosa queimado</span>
+      <span class="swatch"><i style="background:#9AAA8F"></i>Verde sálvia</span>
+      <span class="swatch"><i style="background:#D9C6AA"></i>Areia</span>
+      <span class="swatch"><i style="background:#F7F0E6"></i>Creme</span>
+      <span class="swatch"><i style="background:#54463D"></i>Marrom profundo</span>
+    </div>
+    <p class="sub">Esta paleta serve para contar a origem do nome com sensibilidade. Ela é diferente da direção institucional premium que está sendo desenvolvida para o posicionamento comercial da empresa.</p>
+  </section>
+
+  <section class="section final">
+    <div class="kicker" style="color:#D9C6AA">A essência</div>
+    <div class="serif" style="margin-top:12px">ADIV não é apenas um nome.<br>É uma maneira de olhar a vida.</div>
+    <p>Dois fundadores, inovação, vida, propósito e a decisão de construir algo nobre — olhando para a vida de outra forma.</p>
+    <div class="sharebar">
+      <button class="btn" id="shareBottom">Compartilhar esta história</button>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap" style="text-align:center;padding:24px 0 10px;color:var(--muted);font-size:12px">ADIV · Origem, Significado e Propósito</footer>
+<div class="toast" id="toast">Pronto</div>
+
+<script>
+(()=>{
+  const word=document.getElementById('flipWord'),caption=document.getElementById('flipCaption');let adiv=true;
+  document.getElementById('flipBtn').addEventListener('click',()=>{adiv=!adiv;word.style.opacity='.2';word.style.transform='translateY(4px)';setTimeout(()=>{word.textContent=adiv?'ADIV':'VIDA';caption.textContent=adiv?'Toque abaixo para revelar a origem.':'A origem revelada: VIDA.';word.style.opacity='1';word.style.transform='translateY(0)'},120)});
+  const letters={A:['A — Andrew','Sócio fundador. A primeira letra coloca dentro do próprio nome a história de quem está começando essa construção.'],D:['D — Danillo','Sócio fundador. A segunda letra registra a parceria e a decisão de construir juntos.'],I:['I — Inovação','Inovar é olhar para trás apenas para aprender: não repetir o que não deu certo e buscar algo novo e melhor.'],V:['V — Vida','A letra que fecha o nome e revela seu coração: existir, crescer, renovar-se e enxergar a vida sob outra perspectiva.']};
+  document.querySelectorAll('.letter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.letter').forEach(x=>x.classList.remove('active'));b.classList.add('active');const d=letters[b.dataset.letter];document.getElementById('letterDetail').innerHTML='<strong>'+d[0]+'</strong><p>'+d[1]+'</p>'}));
+  const stories={vida:'A camada mais memorável: ADIV é VIDA invertida. Uma nova maneira de enxergar a vida, aprender com o passado e construir o futuro.',fundadores:'A + D representam Andrew e Danillo. O nome carrega dentro dele a origem da sociedade e a história de quem decidiu construir a empresa.',inovacao:'I representa inovação: aprender com o que já passou, evoluir e buscar uma forma nova e melhor de fazer.',proposito:'A marca foi conectada à ideia de nobreza de intenção e firmeza. Isaías 32:8 funciona como inspiração para construir planos nobres e permanecer firme neles.'};
+  document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('storyPanel').textContent=stories[b.dataset.story]}));
+  function share(){const text='Quero te mostrar a história por trás do nome ADIV — A vida vista de outra forma.';if(navigator.share)navigator.share({title:'ADIV — A Vida Vista de Outra Forma',text,url:location.href}).catch(()=>{});else window.open('https://wa.me/?text='+encodeURIComponent(text+'\n'+location.href),'_blank')}
+  document.getElementById('shareTop').addEventListener('click',share);document.getElementById('shareBottom').addEventListener('click',share);
+})();
+</script>
+</body>
+</html>
