@@ -73,12 +73,18 @@ export async function approveCommercialProposalAndCreateOrder(proposalId: number
     [proposalId, proposal.project_id, proposal.client_id, proposal.product_id, Math.max(1, Number(proposal.quantity || 1)), proposal.notes]
   ) as unknown as Array<{ id: number; project_id: number; quantity: number; status: ProductionOrderStatus }>;
   await advanceProject(proposal.project_id, "aprovado");
+  if(process.env.PL_CENTRAL_URL) await (await import("@/lib/private-label-central")).recordCentralIndustrialEvent(Number(proposal.project_id),`Proposta #${proposalId} aprovada; OP #${inserted[0].id} criada`);
   return inserted[0];
 }
 
 export async function updateProductionOrderStatus(input: { orderId: number; status: ProductionOrderStatus; scheduledDate?: string | null; notes?: string | null }) {
   await ensurePrivateLabelProductionSchema();
   if (!productionOrderStatuses.includes(input.status)) throw new Error("Status de produção inválido.");
+  if (process.env.PL_CENTRAL_URL && input.status === 'em_producao') {
+    const existing = await getSql().query('SELECT project_id FROM production_orders WHERE id=$1',[input.orderId]) as unknown as {project_id:number}[];
+    if (!existing[0]) throw new Error('Ordem de produção não encontrada.');
+    await (await import('@/lib/private-label-central')).assertCentralProductionReady(Number(existing[0].project_id));
+  }
   const rows = await getSql().query(
     `UPDATE production_orders SET status = $2, scheduled_date = $3::date, notes = COALESCE(NULLIF($4, ''), notes), updated_at = NOW()
      WHERE id = $1 RETURNING id, project_id, status`,
@@ -87,6 +93,7 @@ export async function updateProductionOrderStatus(input: { orderId: number; stat
   const order = rows[0];
   if (!order) throw new Error("Ordem de produção não encontrada.");
   if (order.status === "programada" || order.status === "em_producao" || order.status === "concluida") await advanceProject(order.project_id, "producao");
+  if (process.env.PL_CENTRAL_URL) await (await import('@/lib/private-label-central')).recordCentralIndustrialEvent(Number(order.project_id),`OP #${order.id} atualizada para ${order.status}`,input.status==='em_producao'?{stage:'Produção'}:input.status==='programada'?{stage:'Planejamento'}:{});
   return order;
 }
 
