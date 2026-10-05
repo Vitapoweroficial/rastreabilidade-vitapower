@@ -19,8 +19,7 @@ import {
   createProjectFormulaAction,
   createProjectPricingAction,
   createProjectProposalAction,
-  updateProjectProductionOrderAction,
-  updateProjectStageFromDetailAction
+  updateProjectProductionOrderAction
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -55,7 +54,10 @@ export default async function PrivateLabelProjectPage({ params }: { params: Prom
   const lots = detail.lots as unknown as LotRow[];
   const orders = orderRows as unknown as OrderRow[];
   const stage = privateLabelStages.find((item) => item.id === project.status) ?? privateLabelStages[0];
-  const progress = privateLabelStageProgress(stage.id);
+  const central = process.env.PL_CENTRAL_URL ? await (await import('@/lib/private-label-central')).loadCentral() : null;
+  const managed = central?.projects.find(p => p.id === projectId);
+  const stageLabel = managed?.stage || stage.label;
+  const progress = managed && central ? Math.round(Math.max(0,central.settings.stages.indexOf(managed.stage)) / Math.max(1,central.settings.stages.length-1)*100) : privateLabelStageProgress(stage.id);
 
   return (
     <div className="space-y-7 pb-10">
@@ -68,18 +70,17 @@ export default async function PrivateLabelProjectPage({ params }: { params: Prom
         <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-red-600/20 blur-3xl" />
         <div className="relative grid gap-7 xl:grid-cols-[1.25fr_.75fr] xl:items-end">
           <div>
-            <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-red-500/10 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-red-200">Projeto #{project.id}</span><span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-black text-slate-200">{stage.label}</span></div>
+            <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-red-500/10 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-red-200">Projeto #{project.id}</span><span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-black text-slate-200">{stageLabel}</span></div>
             <h1 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-5xl">{project.name}</h1>
             <p className="mt-3 text-base font-bold text-slate-300">{project.brand_name}{project.product_name ? ` · ${project.product_name}` : " · produto em definição"}</p>
             <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-red-500 to-amber-300" style={{ width: `${progress}%` }} /></div>
-            <div className="mt-4 flex flex-wrap gap-2">{privateLabelStages.map((item, index) => <span key={item.id} className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${index <= privateLabelStages.findIndex((s) => s.id === stage.id) ? "bg-white text-slate-950" : "bg-white/10 text-slate-400"}`}>{index + 1}. {item.label}</span>)}</div>
+            <div className="mt-4 flex flex-wrap gap-2">{(managed && central ? central.settings.stages.map(label=>({id:label,label})) : privateLabelStages).map((item, index) => <span key={item.id} className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${index <= (managed && central ? central.settings.stages.indexOf(managed.stage) : privateLabelStages.findIndex((s) => s.id === stage.id)) ? "bg-white text-slate-950" : "bg-white/10 text-slate-400"}`}>{index + 1}. {item.label}</span>)}</div>
           </div>
-          <form action={updateProjectStageFromDetailAction} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-            <input type="hidden" name="projectId" value={project.id} />
-            <label className="text-xs font-black uppercase tracking-[0.15em] text-slate-400">Etapa operacional</label>
-            <select name="stageId" defaultValue={stage.id} className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-slate-900 px-3 text-sm font-bold text-white outline-none">{privateLabelStages.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select>
-            <button className="btn-primary mt-3 w-full justify-center" type="submit">Atualizar etapa</button>
-          </form>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4">
+            <p className="font-bold">Etapa operacional: {stageLabel}</p>
+            <p className="mt-2 text-sm text-slate-300">{managed?.nextAction || 'Defina a próxima ação na Central Private Label.'}</p>
+            <Link href={`/admin/modulos/private-label?project=${project.id}`} className="btn-primary mt-3 w-full justify-center">Gerenciar etapa e pendências</Link>
+          </div>
         </div>
       </section>
 

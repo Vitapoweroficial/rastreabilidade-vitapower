@@ -72,6 +72,13 @@ export async function listPrivateLabelProjects() {
 
 export async function updatePrivateLabelProjectStage(projectId: number, stageId: string) {
   const stage = getPrivateLabelStage(stageId);
+  if (process.env.PL_CENTRAL_URL) {
+    const { loadCentral, saveCentral, sourceStageLabels } = await import('@/lib/private-label-central');
+    const central = await loadCentral();
+    const p = central.projects.find(item => item.id === projectId);
+    if (!p) throw new Error('Projeto não encontrado.');
+    await saveCentral({kind:'project',id:String(projectId),revision:p.revision,payload:{...p,stage:sourceStageLabels[stage.id]||stage.label},summary:`Etapa alterada de ${p.stage} para ${sourceStageLabels[stage.id]||stage.label}`});
+  }
   await query(`UPDATE engineering_projects SET status = $1 WHERE id = $2`, [stage.id, projectId]);
 }
 
